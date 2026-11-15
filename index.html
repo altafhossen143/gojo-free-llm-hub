@@ -215,6 +215,24 @@
   @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}.msgs{height:48vh}.hero{padding-top:34px}.hero h1{font-size:31px}.hero-model b{max-width:170px}}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 
+  /* --- Mode layer (top of chat) + media chips + code blocks --- */
+  .modebar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap;background:#fff}
+  .modebar-actions{display:flex;gap:7px;flex-wrap:wrap}
+  .mode-pills{display:flex;gap:3px;background:var(--panel3);border:1px solid var(--border);border-radius:999px;padding:3px;flex-wrap:wrap}
+  .mode-pills button{border:0;background:transparent;color:var(--muted);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:700;min-height:36px}
+  .mode-pills button.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(16,24,20,.12)}
+  #modePanels>section.card,#modePanels>details.card{border:0;box-shadow:none;margin:0;border-radius:0}
+  #modePanels>details.card>summary{display:none}
+  .mchips{display:flex;gap:7px;flex-wrap:wrap}
+  .mchip{background:#fff;border:1px solid var(--border2);color:var(--text);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;min-height:38px;display:inline-flex;align-items:center;gap:7px;font-family:inherit}
+  .mchip.active{border-color:var(--ink);background:var(--accent-soft)}
+  .msg pre{background:#12140f;color:#e8f0e8;border-radius:10px;padding:12px;overflow-x:auto;font-family:"JetBrains Mono",monospace;font-size:12.5px;line-height:1.55;white-space:pre;margin:6px 0 2px}
+  .codebar{display:flex;gap:6px;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .codebar .cl{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-right:auto}
+  .codebar button{font-size:12.5px;padding:5px 11px;min-height:32px}
+  .preview-frame{width:100%;height:340px;border:1px solid var(--border2);border-radius:10px;margin-top:8px;background:#fff}
+  @media(max-width:640px){.modebar{justify-content:center}.modebar-actions{justify-content:center}}
+
   /* --- Simplified first screen + in-chat model switcher --- */
   .hero{padding-top:26px}
   .hero h1{font-size:32px}
@@ -264,8 +282,22 @@
       <span class="cur"><span data-i18n="curModelLabel">এখনকার মডেল:</span> <b id="curModel">—</b></span>
       <span style="display:flex;gap:7px;flex-wrap:wrap">
         <button class="btn" id="btnCopyChat" type="button" data-i18n="copyBtn">কপি</button>
-        <button class="btn btn-danger" id="btnClear" type="button" data-i18n="clearBtn">নতুন চ্যাট</button>
       </span>
+    </div>
+    <div class="modebar">
+      <div class="modebar-actions">
+        <button class="btn btn-danger" id="btnClear" type="button" data-i18n="clearBtn">নতুন চ্যাট</button>
+        <button class="btn" id="btnPic" type="button" data-i18n="picBtn">🖼️ ছবি বানান</button>
+        <button class="btn" id="btnVid" type="button" data-i18n="vidBtn">🎬 ভিডিও বানান</button>
+      </div>
+      <div class="mode-pills" role="tablist" aria-label="Mode">
+        <button type="button" class="mode-pill active" data-mode="chat" role="tab" data-i18n="modeChat">💬 চ্যাট</button>
+        <button type="button" class="mode-pill" data-mode="image" role="tab" data-i18n="modeImage">🎨 ছবি</button>
+        <button type="button" class="mode-pill" data-mode="video" role="tab" data-i18n="modeVideo">🎬 ভিডিও</button>
+        <button type="button" class="mode-pill" data-mode="website" role="tab" data-i18n="modeWeb">🌐 ওয়েবসাইট</button>
+        <button type="button" class="mode-pill" data-mode="coding" role="tab" data-i18n="modeCode">💻 কোডিং</button>
+        <button type="button" class="mode-pill" data-mode="more" role="tab" data-i18n="modeMore">⋯ আরও</button>
+      </div>
     </div>
     <div class="switcher-bar">
       <label for="quickSwitch" data-i18n="switchLabel">⚡ মডেল বদলান:</label>
@@ -276,6 +308,7 @@
         <button class="btn" id="btnLoadAll" type="button" data-i18n="loadAllBtn">↻ সব মডেল লোড</button>
       </span>
     </div>
+    <div id="chatBody">
     <div class="msgs" id="msgs">
       <div class="empty" id="emptyState">
         <div class="big">✦</div>
@@ -302,6 +335,8 @@
         <span data-i18n="chatFoot">উত্তর সরাসরি প্রোভাইডারের API থেকে আসে • ভুল তথ্য যাচাই করে নিন</span>
       </div>
     </div>
+    </div>
+    <div id="modePanels"></div>
   </section>
 
   <!-- Provider + Model pickers (advanced, collapsed) -->
@@ -495,8 +530,17 @@
       </div>
       <div class="field">
         <label class="label" for="imgPolliModel" data-i18n="imgPolliLabel">Pollinations মডেল (ফ্রি মোডে)</label>
-        <select id="imgPolliModel"><option value="flux">FLUX</option><option value="turbo">Turbo</option></select>
+        <select id="imgPolliModel"><option value="flux">FLUX · FREE (no key)</option><option value="turbo">Turbo · FREE (no key)</option><option value="gptimage">GPT Image · PAID (Pollen)</option><option value="kontext">Kontext · PAID (Pollen)</option><option value="seedream">Seedream · PAID (Pollen)</option><option value="nanobanana">Nano Banana · PAID (Pollen)</option><option value="nanobanana-pro">Nano Banana Pro · PAID (Pollen)</option></select>
       </div>
+    </div>
+    <div class="field">
+      <span class="label" data-i18n="imgChipsLabel">Pollinations মডেল — এক ক্লিকে বাছুন (ফ্রি আগে)</span>
+      <div class="mchips" id="imgChips"></div>
+    </div>
+    <div class="field" id="imgPolliKeyRow" style="display:none">
+      <label class="label" for="keyPolliImg" data-i18n="imgPolliKeyLabel">Pollinations API Key (PAID/Pollen মডেলের জন্য)</label>
+      <input type="password" id="keyPolliImg" class="mono" placeholder="…" autocomplete="off" spellcheck="false">
+      <div class="hint" data-i18n="imgPolliKeyHint">ফ্রি key পেতে: enter.pollinations.ai — এই একই key ভিডিও বানাতেও কাজ করে।</div>
     </div>
     <button class="btn btn-accent" id="btnGenImg" type="button" style="width:100%" data-i18n="imgGen">🎨 ছবি বানান</button>
     <div class="err" id="imgErr"></div>
@@ -523,6 +567,37 @@
   <!-- Video -->
   <details class="card" id="videoSec"><summary><span data-i18n="vidTitle">🎬 ভিডিও বানানো — Video</span> <span class="hint">Video tools</span></summary><div class="body">
     <h2 data-i18n="vidTitle">🎬 ভিডিও বানানো — Video</h2>
+    <h3 style="margin-top:4px" data-i18n="vidGenTitle">🎬 এখানেই ভিডিও বানান — Pollinations</h3>
+    <p class="sec-sub" data-i18n="vidGenDesc">মডেল বেছে প্রম্পট লিখলেই এখান থেকে সরাসরি ভিডিও বানানো যাবে। এই মডেলগুলো চলে ফ্রি Pollinations key দিয়ে (আগে ফ্রি “Quest Pollen” খরচ হয়)। ব্রাউজার থেকে key ছাড়া কোনো ভিডিও API চলে না — key না থাকলে নিচের ফ্রি-ক্রেডিট ওয়েবসাইটগুলো ব্যবহার করুন।</p>
+    <div class="field" style="margin-top:12px">
+      <span class="label" data-i18n="vidModelLabel">ভিডিও মডেল — সব FREE (free key), এক ক্লিকে বাছুন</span>
+      <div class="mchips" id="vidChips"></div>
+    </div>
+    <div class="field">
+      <label class="label" for="vidPrompt" data-i18n="vidPromptLabel">ভিডিওর বর্ণনা (Prompt) — ইংরেজিতে লিখলে ফল ভালো হয়</label>
+      <textarea id="vidPrompt" rows="2">a cute cartoon carrot king dancing in a sunny garden, colorful storybook style</textarea>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label class="label" for="vidDur" data-i18n="vidDurLabel">সময় (সেকেন্ড)</label>
+        <select id="vidDur"><option value="4">4s</option><option value="6">6s</option><option value="8">8s</option><option value="10">10s</option></select>
+      </div>
+      <div class="field">
+        <label class="label" for="keyPolli" data-i18n="vidKeyLabel">Pollinations API Key</label>
+        <input type="password" id="keyPolli" class="mono" placeholder="…" autocomplete="off" spellcheck="false">
+        <div class="hint"><span data-i18n="vidKeyHint">ফ্রি key পেতে:</span> <a href="https://enter.pollinations.ai" target="_blank" rel="noopener">enter.pollinations.ai</a></div>
+      </div>
+    </div>
+    <button class="btn btn-accent" id="btnGenVid" type="button" style="width:100%" data-i18n="vidGenBtn">🎬 ভিডিও বানান</button>
+    <div class="err" id="vidErr"></div>
+    <div class="okmsg" id="vidOk"></div>
+    <div class="img-out" id="vidOut">
+      <video id="vidResult" controls playsinline style="width:100%;border-radius:14px;border:1px solid var(--border);background:#000;display:block"></video>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">
+        <a class="btn btn-primary" id="vidDownload" href="#" target="_blank" rel="noopener" data-i18n="vidDl">⬇ ভিডিও ডাউনলোড / খুলুন</a>
+      </div>
+      <p class="hint" id="vidMeta" style="margin-top:7px"></p>
+    </div>
     <div class="warnbox" data-i18n="vidWarn">ℹ️ OpenRouter আর FreeLLMAPI API দিয়ে ভিডিও বানানোর সুবিধা দেয় না — ভিডিও বানাতে নিচের ওয়েবসাইটগুলো সরাসরি ব্যবহার করুন। কয়েকটায় ফ্রি ক্রেডিট থাকে, বাকিগুলো পেইড।</div>
     <div class="dir-grid">
       <div class="tool"><h3>Luma Dream Machine <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vLuma">টেক্সট/ছবি থেকে সুন্দর ভিডিও, ফ্রি ক্রেডিট দিয়ে শুরু করা যায়।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://lumalabs.ai/dream-machine" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
@@ -772,7 +847,10 @@
     g4Warn:"⚠️ FreeLLMAPI only works while the proxy is running AND reachable from this browser. On a phone, localhost means the phone itself — put the server's real address in the Base URL.",
     g5T:"5) Creating images",g5p:"Free: Pollinations mode — no key needed. Paid: OpenRouter mode — uses credit. FreeLLMAPI: if the server has an image endpoint, type the model ID manually in that mode.",
     gTroubleT:"Common problems",gTrouble:"401: wrong or expired key. 429: free limit reached — wait or pick another model. Failed to fetch: server is off or the URL is wrong. Empty model list: set the filter to “All models” and load again.",
-    foot:"Gojo Free LLM Hub • Keys stay only in your browser — no key is hardcoded in this page<br>OpenRouter • FreeLLMAPI • Groq • Cerebras • Mistral"
+    foot:"Gojo Free LLM Hub • Keys stay only in your browser — no key is hardcoded in this page<br>OpenRouter • FreeLLMAPI • Groq • Cerebras • Mistral",
+    picBtn:"🖼️ Create picture",vidBtn:"🎬 Create video",modeChat:"💬 Chat",modeImage:"🎨 Image",modeVideo:"🎬 Video",modeWeb:"🌐 Website",modeCode:"💻 Coding",modeMore:"⋯ More",
+    imgChipsLabel:"Pollinations model — one click to pick (free first)",imgPolliKeyLabel:"Pollinations API Key (for PAID/Pollen models)",imgPolliKeyHint:"Get a free key at enter.pollinations.ai — the same key also works for video generation.",
+    vidGenTitle:"🎬 Generate video right here — Pollinations",vidGenDesc:"Pick a model, write a prompt, and generate a video right here. These models run on a free Pollinations key (free “Quest Pollen” is used first). No video API works keyless from the browser — without a key, use the free-credit websites below.",vidModelLabel:"Video model — all FREE (free key), one click to pick",vidPromptLabel:"Video description (prompt) — English works best",vidDurLabel:"Duration (seconds)",vidKeyLabel:"Pollinations API Key",vidKeyHint:"Get a free key:",vidGenBtn:"🎬 Generate video",vidDl:"⬇ Download / open video"
   };
   var EN_PH={ heroPh:"Ask anything…", modelSearchPh:"e.g. llama, gemini, deepseek, qwen…", inputPh:"Type a message… (Enter = send)", battlePh:"Write one question — both models will answer it…" };
   var DYN={
@@ -795,6 +873,8 @@
     document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ var k=el.getAttribute("data-i18n-ph"); if(ph[k]!=null) el.setAttribute("placeholder", ph[k]); });
     document.querySelectorAll("[data-q-bn]").forEach(function(b){ b.setAttribute("data-q", lang==="en" ? b.getAttribute("data-q-en") : b.getAttribute("data-q-bn")); });
     if(typeof renderProvGrid==="function"){ renderProvGrid(); renderModelOptions(); renderBoard(); renderCards(); }
+    if(typeof renderMediaChips==="function"){ renderMediaChips(); syncImgPolliUI(); }
+    if(typeof applyMode==="function") applyMode();
     if(typeof updateStatus==="function") updateStatus();
     if(!silent && typeof toast==="function") toast(lang==="en" ? "Language: English ✓" : "ভাষা: বাংলা ✓");
   }
@@ -1184,7 +1264,7 @@
     d.appendChild(body); els.msgs.appendChild(d); els.msgs.scrollTop=els.msgs.scrollHeight; return body;
   }
   function buildMessages(userText){
-    var out=[]; var sysTxt=els.txtSystem.value.trim();
+    var out=[]; var sysTxt = (typeof curMode!=="undefined" && curMode==="website") ? SYS_WEB : (typeof curMode!=="undefined" && curMode==="coding") ? SYS_CODE : els.txtSystem.value.trim();
     if(sysTxt) out.push({role:"system", content:sysTxt});
     state.history.forEach(function(h){ out.push(h); });
     out.push({role:"user", content:userText}); return out;
@@ -1230,6 +1310,7 @@
       if(!full) assistantBody.textContent= lang==="en" ? "(Empty answer — try another model)" : "(খালি উত্তর এসেছে — অন্য মডেল চেষ্টা করুন)";
       state.history.push({role:"user",content:text}); state.history.push({role:"assistant",content:full});
       if(state.history.length>40) state.history=state.history.slice(-40);
+      if(full && (curMode==="website" || curMode==="coding")) renderRich(assistantBody, full);
     })
     .catch(function(e){
       if(e && e.name==="AbortError"){ assistantBody.textContent=full+"\n\n[stopped]"; if(full){ state.history.push({role:"user",content:text}); state.history.push({role:"assistant",content:full}); } return; }
@@ -1277,12 +1358,25 @@
     els.btnGenImg.disabled=true; els.btnGenImg.innerHTML='<span class="spin"></span> …';
     function done(){ els.btnGenImg.disabled=false; els.btnGenImg.textContent = lang==="en" ? "🎨 Generate image" : "🎨 ছবি বানান"; }
     if(mode==="pollinations"){
-      var seed=Math.floor(Math.random()*999999);
-      var url="https://image.pollinations.ai/prompt/"+encodeURIComponent(prompt)+"?width="+w+"&height="+h+"&seed="+seed+"&model="+encodeURIComponent(els.imgPolliModel.value)+"&nologo=true";
-      var pre=new Image();
-      pre.onload=function(){ showImg(url,"Pollinations • "+els.imgPolliModel.value+" • "+size+" • FREE"); showBox(els.imgOk,"✓ "+(lang==="en" ? "Image created (Pollinations, free)." : "ছবি তৈরি (Pollinations, ফ্রি)।")); done(); };
-      pre.onerror=function(){ showBox(els.imgErr, lang==="en" ? "Pollinations didn't return an image — try again shortly." : "Pollinations থেকে ছবি আসেনি — একটু পরে আবার চেষ্টা করুন।"); done(); };
-      pre.src=url; return;
+      var pm=els.imgPolliModel.value;
+      var pmFree = (pm==="flux" || pm==="turbo");
+      if(pmFree){
+        var seed=Math.floor(Math.random()*999999);
+        var url="https://image.pollinations.ai/prompt/"+encodeURIComponent(prompt)+"?width="+w+"&height="+h+"&seed="+seed+"&model="+encodeURIComponent(pm)+"&nologo=true";
+        var pre=new Image();
+        pre.onload=function(){ showImg(url,"Pollinations • "+pm+" • "+size+" • FREE (no key)"); showBox(els.imgOk,"✓ "+(lang==="en" ? "Image created (Pollinations, free)." : "ছবি তৈরি (Pollinations, ফ্রি)।")); done(); };
+        pre.onerror=function(){ showBox(els.imgErr, lang==="en" ? "Pollinations didn't return an image — try again shortly." : "Pollinations থেকে ছবি আসেনি — একটু পরে আবার চেষ্টা করুন।"); done(); };
+        pre.src=url; return;
+      }
+      var pk=polliKeyVal();
+      if(!pk){ showBox(els.imgErr, lang==="en" ? "This Pollinations model is PAID (Pollen). Add a free Pollinations key in the key field above — get one free at enter.pollinations.ai. Or pick FLUX / Turbo, which are FREE with no key." : "এই Pollinations মডেলটা PAID (Pollen)। উপরের key ঘরে ফ্রি Pollinations key বসান — enter.pollinations.ai থেকে ফ্রিতে পাবেন। অথবা FLUX / Turbo বাছুন — ওগুলো key ছাড়াই FREE।"); done(); return; }
+      var gurl="https://gen.pollinations.ai/image/"+encodeURIComponent(prompt)+"?model="+encodeURIComponent(pm)+"&width="+w+"&height="+h;
+      fetch(gurl, { headers:{ "Authorization":"Bearer "+pk } })
+        .then(function(r){ if(!r.ok) return r.text().then(function(tx){ throw new Error("HTTP "+r.status+" — "+tx.slice(0,250)); }); return r.blob(); })
+        .then(function(b){ var ou=URL.createObjectURL(b); showImg(ou,"Pollinations • "+pm+" • "+size+" • PAID (Pollen)"); showBox(els.imgOk,"✓ "+(lang==="en" ? "Image created." : "ছবি তৈরি হয়েছে।")); })
+        .catch(function(e){ showBox(els.imgErr, (lang==="en" ? "Image failed: " : "ছবি হয়নি: ")+(e && e.message?e.message:e)); })
+        .finally(done);
+      return;
     }
     var isOr = mode==="openrouter";
     var base = isOr ? "https://openrouter.ai/api/v1" : flBaseNorm();
@@ -1376,6 +1470,7 @@
   });
   els.btnWipe.addEventListener("click", function(){
     ORDER.forEach(function(p){ lsDel(PROVIDERS[p].lsKey); var el=$(PROVIDERS[p].keyEl); if(el) el.value=""; });
+    lsDel(POLLI_LS); ["keyPolli","keyPolliImg"].forEach(function(id){ var pe=$(id); if(pe) pe.value=""; });
     updateStatus(); showBox(els.setOk, lang==="en" ? "All keys deleted from this browser." : "সব key মুছে ফেলা হয়েছে এই ব্রাউজার থেকে।"); toast("✓");
   });
   els.btnLoadImg.addEventListener("click", loadImgModels);
@@ -1409,7 +1504,117 @@
       });
     });
   });
+  /* ---------- Modes: Chat / Image / Video / Website / Coding / More ---------- */
+  var SYS_WEB="You are an expert front-end web developer. When the user describes a website or web app, reply with ONE complete, self-contained HTML file — inline CSS in a <style> tag and inline JavaScript in a <script> tag — inside a single ```html code block, followed by one short line about what you built. Make it polished, responsive and ready to open in a browser. Outside the code block, reply in the user's language (Bangla if they write Bangla, English if English).";
+  var SYS_CODE="You are an expert programmer and debugger. Write clean, correct, working code inside fenced code blocks with the language name (for example ```python). Keep explanations brief and practical, point out bugs and their fixes clearly, and prefer complete runnable examples over fragments. Outside the code blocks, reply in the user's language (Bangla if they write Bangla, English if English).";
+  var POLLI_LS="gojo_llm_hub_pollinations_key";
+  var IMG_PMODELS=[["flux","FLUX",1],["turbo","Turbo",1],["gptimage","GPT Image",0],["kontext","Kontext",0],["seedream","Seedream",0],["nanobanana","Nano Banana",0],["nanobanana-pro","Nano Banana Pro",0]];
+  var VID_MODELS=["veo","seedance","seedance-2.0","wan","wan-fast","wan-pro","ltx-2","nova-reel","grok-video-pro"];
+  var curMode="chat", selVidModel="veo";
+  var MORE_IDS=["pickPanel","battleSec","lbSec","cardsSec","optPanel","dirSec","hostSec","guideSec","settingsPanel"];
+  function polliKeyVal(){ var a=$("keyPolli"), b=$("keyPolliImg"); return ((a&&a.value.trim())||(b&&b.value.trim())||lsGet(POLLI_LS,"")||"").trim(); }
+  function syncPolliKey(src){ lsSet(POLLI_LS, src.value.trim()); ["keyPolli","keyPolliImg"].forEach(function(id){ var el=$(id); if(el && el!==src) el.value=src.value; }); }
+  function renderMediaChips(){
+    var ic=$("imgChips");
+    if(ic){ ic.innerHTML=""; IMG_PMODELS.forEach(function(mp){
+      var b=document.createElement("button"); b.type="button"; b.className="mchip"+(els.imgPolliModel.value===mp[0] ? " active" : "");
+      b.innerHTML=escapeHtml(mp[1])+" "+(mp[2] ? '<span class="badge badge-free">FREE</span>' : '<span class="badge badge-paid">PAID · Pollen</span>');
+      b.addEventListener("click", function(){ els.imgMode.value="pollinations"; els.imgPolliModel.value=mp[0]; syncImgPolliUI(); toast(mp[1]); });
+      ic.appendChild(b);
+    }); }
+    var vc=$("vidChips");
+    if(vc){ vc.innerHTML=""; VID_MODELS.forEach(function(vm){
+      var b=document.createElement("button"); b.type="button"; b.className="mchip"+(selVidModel===vm ? " active" : "");
+      b.innerHTML=escapeHtml(vm)+' <span class="badge badge-free">FREE (free key)</span>';
+      b.addEventListener("click", function(){ selVidModel=vm; renderMediaChips(); });
+      vc.appendChild(b);
+    }); }
+  }
+  function syncImgPolliUI(){
+    var paid = ["gptimage","kontext","seedream","nanobanana","nanobanana-pro"].indexOf(els.imgPolliModel.value)!==-1;
+    var row=$("imgPolliKeyRow"); if(row) row.style.display = paid ? "block" : "none";
+    renderMediaChips();
+  }
+  function applyMode(){
+    document.querySelectorAll(".mode-pill").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-mode")===curMode); });
+    var chatLike = curMode==="chat" || curMode==="website" || curMode==="coding";
+    var cb=$("chatBody"); if(cb) cb.style.display = chatLike ? "" : "none";
+    var is=$("imageSec"); if(is) is.style.display = curMode==="image" ? "" : "none";
+    var vs=$("videoSec"); if(vs) vs.style.display = curMode==="video" ? "" : "none";
+    MORE_IDS.forEach(function(id){ var el=$(id); if(el) el.style.display = curMode==="more" ? "" : "none"; });
+    if(curMode==="website") els.input.setAttribute("placeholder", lang==="en" ? "Describe the website you want to build…" : "কেমন ওয়েবসাইট বানাতে চান? বর্ণনা লিখুন…");
+    else if(curMode==="coding") els.input.setAttribute("placeholder", lang==="en" ? "Ask for code, or describe a bug…" : "কোড চান বা বাগের বর্ণনা লিখুন…");
+    else els.input.setAttribute("placeholder", ((lang==="en" ? EN_PH : BN_PH).inputPh) || "");
+  }
+  function setMode(m){ curMode=m; applyMode(); }
+  function renderRich(bodyEl, text){
+    bodyEl.innerHTML="";
+    function addText(s){ var clean=(s||"").replace(/^\n+|\n+$/g,""); if(!clean) return; var d=document.createElement("div"); d.textContent=clean; bodyEl.appendChild(d); }
+    function addCode(lng, code){
+      var wrap=document.createElement("div");
+      var bar=document.createElement("div"); bar.className="codebar";
+      var lab=document.createElement("span"); lab.className="cl"; lab.textContent=lng || "code"; bar.appendChild(lab);
+      var cp=document.createElement("button"); cp.type="button"; cp.className="btn"; cp.textContent= lang==="en" ? "⧉ Copy code" : "⧉ কোড কপি";
+      cp.addEventListener("click", function(){ if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(function(){ toast("✓"); }, function(){ toast("✗"); }); });
+      bar.appendChild(cp);
+      var isHtml = /<\s*(html|head|body|div|section|style|script|p|h1|ul|table)/i.test(code);
+      if(curMode==="website" && isHtml){
+        var pv=document.createElement("button"); pv.type="button"; pv.className="btn btn-accent"; pv.textContent= lang==="en" ? "▶ Live preview" : "▶ লাইভ প্রিভিউ";
+        pv.addEventListener("click", function(){
+          var f=wrap.querySelector("iframe");
+          if(f){ f.remove(); return; }
+          var ifr=document.createElement("iframe"); ifr.className="preview-frame"; ifr.setAttribute("sandbox","allow-scripts"); ifr.srcdoc=code; wrap.appendChild(ifr);
+        });
+        bar.appendChild(pv);
+      }
+      wrap.appendChild(bar);
+      var pre=document.createElement("pre"); var cd=document.createElement("code"); cd.textContent=code.replace(/\n+$/,""); pre.appendChild(cd); wrap.appendChild(pre);
+      bodyEl.appendChild(wrap);
+    }
+    var re=/```([a-zA-Z0-9+#-]*)\n([\s\S]*?)```/g, last=0, m;
+    while((m=re.exec(text))!==null){ addText(text.slice(last, m.index)); addCode(m[1], m[2]); last=re.lastIndex; }
+    addText(text.slice(last));
+  }
+  function genVideo(){
+    var promptEl=$("vidPrompt"); if(!promptEl) return;
+    var prompt=promptEl.value.trim();
+    showBox($("vidErr"),""); showBox($("vidOk"),"");
+    if(!prompt){ showBox($("vidErr"), lang==="en" ? "Write a video prompt first." : "আগে ভিডিওর বর্ণনা (prompt) লিখুন।"); return; }
+    var key=polliKeyVal();
+    if(!key){ showBox($("vidErr"), lang==="en" ? "Free Pollinations key needed — get one free at enter.pollinations.ai, paste it in the key field above, then generate. (No video API works keyless from the browser.)" : "ফ্রি Pollinations key লাগবে — enter.pollinations.ai থেকে ফ্রিতে key নিয়ে উপরের ঘরে বসান, তারপর বানান। (ব্রাউজার থেকে key ছাড়া কোনো ভিডিও API চলে না।)"); return; }
+    var btn=$("btnGenVid"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> …';
+    var dur=($("vidDur") && $("vidDur").value) || "4";
+    var url="https://gen.pollinations.ai/video/"+encodeURIComponent(prompt)+"?model="+encodeURIComponent(selVidModel)+"&duration="+encodeURIComponent(dur);
+    function done(){ btn.disabled=false; btn.textContent= lang==="en" ? "🎬 Generate video" : "🎬 ভিডিও বানান"; }
+    fetch(url, { headers:{ "Authorization":"Bearer "+key } }).then(function(r){
+      if(!r.ok) return r.text().then(function(tx){ throw new Error("HTTP "+r.status+" — "+tx.slice(0,250)); });
+      var ct=r.headers.get("content-type") || "";
+      if(ct.indexOf("json")!==-1) return r.json().then(function(j){ return { json:j }; });
+      return r.blob().then(function(b){ return { blob:b }; });
+    }).then(function(res){
+      var src="";
+      if(res.blob) src=URL.createObjectURL(res.blob);
+      else if(res.json){ var j=res.json; src=j.url || j.video_url || (j.data && j.data[0] && (j.data[0].url || j.data[0].video_url)) || ""; if(!src) throw new Error(lang==="en" ? "Unexpected response from Pollinations." : "Pollinations থেকে অপ্রত্যাশিত উত্তর এসেছে।"); }
+      var v=$("vidResult"); v.src=src; $("vidDownload").href=src;
+      $("vidMeta").textContent="Pollinations • "+selVidModel+" • "+dur+"s • FREE (free key)";
+      $("vidOut").style.display="block"; $("vidOut").scrollIntoView({behavior:"smooth", block:"center"});
+      showBox($("vidOk"), "✓ "+(lang==="en" ? "Video created." : "ভিডিও তৈরি হয়েছে।"));
+    }).catch(function(e){ showBox($("vidErr"), (lang==="en" ? "Video failed: " : "ভিডিও হয়নি: ")+(e && e.message ? e.message : e)); }).finally(done);
+  }
+  document.querySelectorAll(".mode-pill").forEach(function(b){ b.addEventListener("click", function(){ setMode(b.getAttribute("data-mode")); }); });
+  $("btnPic").addEventListener("click", function(){ setMode("image"); });
+  $("btnVid").addEventListener("click", function(){ setMode("video"); });
+  document.querySelectorAll(".top-link").forEach(function(a){ a.addEventListener("click", function(){ setMode("more"); }); });
+  var dirVidLink=document.querySelector('#dirGrid a[href="#videoSec"]');
+  if(dirVidLink) dirVidLink.addEventListener("click", function(){ setMode("video"); });
+  ["keyPolli","keyPolliImg"].forEach(function(id){ var el=$(id); if(el){ el.value=lsGet(POLLI_LS,""); el.addEventListener("input", function(){ syncPolliKey(el); }); } });
+  $("btnGenVid").addEventListener("click", genVideo);
+  els.imgPolliModel.addEventListener("change", syncImgPolliUI);
+
   /* ---------- Init ---------- */
+  var modePanelsEl=$("modePanels");
+  if(modePanelsEl){ modePanelsEl.appendChild($("imageSec")); modePanelsEl.appendChild($("videoSec")); var vsEl=$("videoSec"); if(vsEl && vsEl.tagName==="DETAILS") vsEl.open=true; }
+  renderMediaChips(); syncImgPolliUI(); applyMode();
   syncPriceFilter();
   setLang(lang, true);
   setProvider(state.provider);
