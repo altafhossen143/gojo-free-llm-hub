@@ -214,6 +214,19 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}.msgs{height:48vh}.hero{padding-top:34px}.hero h1{font-size:31px}.hero-model b{max-width:170px}}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
+
+  /* --- Simplified first screen + in-chat model switcher --- */
+  .hero{padding-top:26px}
+  .hero h1{font-size:32px}
+  .hero p{font-size:15px;margin-top:10px}
+  .switcher-bar{display:flex;gap:8px;align-items:center;padding:10px 14px;background:var(--accent-soft);border-bottom:1px solid var(--accent-border);flex-wrap:wrap}
+  .switcher-bar label{font-size:13.5px;font-weight:700;color:#0b4f47;white-space:nowrap}
+  .switcher-bar select{flex:1 1 200px;min-width:0;font-weight:600;background:#fff}
+  .switcher-nav{display:flex;gap:6px;flex:none}
+  .switcher-nav .btn{min-height:40px;padding:8px 13px;background:#fff}
+  #pickPanel>section.card{border:none;box-shadow:none;margin-top:0;border-radius:0;border-top:1px solid var(--border)}
+  #pickPanel>section.card:first-of-type{border-top:none}
+  @media(max-width:640px){.switcher-bar select{flex-basis:100%;order:3}.switcher-nav{margin-left:auto}}
 </style>
 </head>
 <body>
@@ -240,30 +253,60 @@
       <span class="pill">Key: <b id="stKey">নেই</b></span>
       <span class="pill"><span data-i18n="stModel">মডেল:</span> <b id="stCount">—</b></span>
     </div>
-    <div class="hero-box">
-      <textarea id="heroInput" rows="3" data-i18n-ph="heroPh" placeholder="যেকোনো কিছু জিজ্ঞেস করুন…"></textarea>
-      <div class="hero-row">
-        <span class="hero-model">⚡ <span data-i18n="heroModelLabel">মডেল:</span> <b id="heroModel">—</b></span>
-        <button class="hero-send" id="btnHeroSend" type="button"><span data-i18n="heroSend">পাঠান →</span></button>
-      </div>
-    </div>
-    <div class="chips">
-      <button type="button" class="hero-chip" data-q-bn="বাংলায় নিজের পরিচয় দাও — তুমি কোন মডেল, কী কী করতে পারো?" data-q-en="Introduce yourself — which model are you, and what can you do?" data-i18n="q1">তুমি কোন মডেল?</button>
-      <button type="button" class="hero-chip" data-q-bn="ক্রিপ্টো নিয়ে X (Twitter)-এর জন্য ২ লাইনের একটা মজার পোস্ট লিখে দাও" data-q-en="Write a fun 2-line X (Twitter) post about crypto" data-i18n="q2">X পোস্ট লিখে দাও</button>
-      <button type="button" class="hero-chip" data-q-bn="একটা ১ মিনিটের কার্টুন গল্পের আইডিয়া দাও — সবজি চরিত্র দিয়ে" data-q-en="Give me an idea for a 1-minute cartoon story with vegetable characters" data-i18n="q3">কার্টুন গল্পের আইডিয়া</button>
-      <button type="button" class="hero-chip" data-q-bn="সহজ ভাষায় বুঝিয়ে দাও: LLM API কী?" data-q-en="Explain in simple words: what is an LLM API?" data-i18n="q4">LLM API কী?</button>
-    </div>
-    <div class="navrow">
-      <a href="#chatSec" data-i18n="navChat">💬 চ্যাট</a><a href="#battleSec" data-i18n="navBattle2">⚔️ ব্যাটল মোড</a><a href="#lbSec" data-i18n="navLb2">🏆 লিডারবোর্ড</a><a href="#imageSec" data-i18n="navImage">🎨 ছবি বানান</a><a href="#videoSec" data-i18n="navVideo">🎬 ভিডিও টুল</a><a href="#dirSec" data-i18n="navDir">📚 সব প্রোভাইডার</a><a href="#hostSec" data-i18n="navHost">🌐 ফ্রি হোস্টিং</a><a href="#guideSec" data-i18n="navGuide">📖 গাইড</a>
-    </div>
   </header>
 
-  <div class="mode-tabs" role="tablist">
-    <button type="button" class="mode-tab active" data-mode="chat" data-i18n="tabChat">💬 চ্যাট</button>
-    <button type="button" class="mode-tab" data-mode="battle" data-i18n="tabBattle">⚔️ ব্যাটল</button>
-    <button type="button" class="mode-tab" data-mode="board" data-i18n="tabBoard">🏆 লিডারবোর্ড</button>
-  </div>
 
+
+  <!-- Chat -->
+  <section class="card chat-card" id="chatSec" aria-label="Chat">
+    <div class="chat-head">
+      <h2 style="font-size:16px" data-i18n="chatTitle">💬 চ্যাট</h2>
+      <span class="cur"><span data-i18n="curModelLabel">এখনকার মডেল:</span> <b id="curModel">—</b></span>
+      <span style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn" id="btnCopyChat" type="button" data-i18n="copyBtn">কপি</button>
+        <button class="btn btn-danger" id="btnClear" type="button" data-i18n="clearBtn">নতুন চ্যাট</button>
+      </span>
+    </div>
+    <div class="switcher-bar">
+      <label for="quickSwitch" data-i18n="switchLabel">⚡ মডেল বদলান:</label>
+      <select id="quickSwitch" class="mono" aria-label="Model switcher"></select>
+      <span class="switcher-nav">
+        <button class="btn" id="btnPrevModel" type="button" aria-label="Previous model" title="Previous model">◀</button>
+        <button class="btn" id="btnNextModel" type="button" aria-label="Next model" title="Next model">▶</button>
+        <button class="btn" id="btnLoadAll" type="button" data-i18n="loadAllBtn">↻ সব মডেল লোড</button>
+      </span>
+    </div>
+    <div class="msgs" id="msgs">
+      <div class="empty" id="emptyState">
+        <div class="big">✦</div>
+        <p><b style="color:var(--text)" data-i18n="emptyTitle">কী নিয়ে কথা বলতে চান?</b></p>
+        <p data-i18n="emptyDesc">উপরের সুইচার থেকে এক ক্লিকে যেকোনো মডেল বেছে নিচে মেসেজ লিখুন।</p>
+        <div class="quick">
+          <button type="button" class="quick-btn" data-q-bn="বাংলায় নিজের পরিচয় দাও — তুমি কোন মডেল, কী কী করতে পারো?" data-q-en="Introduce yourself — which model are you, and what can you do?" data-i18n="q1">তুমি কোন মডেল?</button>
+          <button type="button" class="quick-btn" data-q-bn="ক্রিপ্টো নিয়ে X (Twitter)-এর জন্য ২ লাইনের একটা মজার পোস্ট লিখে দাও" data-q-en="Write a fun 2-line X (Twitter) post about crypto" data-i18n="q2">X পোস্ট লিখে দাও</button>
+          <button type="button" class="quick-btn" data-q-bn="একটা ১ মিনিটের কার্টুন গল্পের আইডিয়া দাও — সবজি চরিত্র দিয়ে" data-q-en="Give me an idea for a 1-minute cartoon story with vegetable characters" data-i18n="q3">কার্টুন গল্পের আইডিয়া</button>
+          <button type="button" class="quick-btn" data-q-bn="সহজ ভাষায় বুঝিয়ে দাও: LLM API কী?" data-q-en="Explain in simple words: what is an LLM API?" data-i18n="q4">LLM API কী?</button>
+        </div>
+      </div>
+    </div>
+    <div class="composer">
+      <div class="composer-row">
+        <textarea id="input" rows="2" data-i18n-ph="inputPh" placeholder="মেসেজ লিখুন… (Enter = পাঠান)"></textarea>
+        <button class="btn btn-primary send-btn" id="btnSend" type="button" aria-label="Send">➤</button>
+      </div>
+      <div style="margin-top:8px;display:none" id="stopRow">
+        <button class="btn btn-danger" id="btnStop" type="button" style="width:100%" data-i18n="stopBtn">■ উত্তর থামান</button>
+      </div>
+      <div class="composer-foot">
+        <span id="chatStatus" data-i18n="ready">প্রস্তুত</span>
+        <span data-i18n="chatFoot">উত্তর সরাসরি প্রোভাইডারের API থেকে আসে • ভুল তথ্য যাচাই করে নিন</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Provider + Model pickers (advanced, collapsed) -->
+  <details class="card" id="pickPanel">
+    <summary><span data-i18n="pickTitle">🎛️ প্রোভাইডার ও মডেল — বিস্তারিত</span> <span class="hint">Provider &amp; Model</span></summary>
   <!-- Provider picker -->
   <section class="card" aria-label="Provider">
     <div class="sec-head">
@@ -307,43 +350,7 @@
     <p class="hint" style="margin:10px 0 0" id="modelHint" data-i18n="modelHint">মডেল তালিকা লোড করতে বেশিরভাগ প্রোভাইডারে key লাগে। key না থাকলে নিচের Settings-এ বসান।</p>
   </section>
 
-  <!-- Chat -->
-  <section class="card chat-card" id="chatSec" aria-label="Chat">
-    <div class="chat-head">
-      <h2 style="font-size:16px" data-i18n="chatTitle">💬 চ্যাট</h2>
-      <span class="cur"><span data-i18n="curModelLabel">এখনকার মডেল:</span> <b id="curModel">—</b></span>
-      <span style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="btn" id="btnCopyChat" type="button" data-i18n="copyBtn">কপি</button>
-        <button class="btn btn-danger" id="btnClear" type="button" data-i18n="clearBtn">নতুন চ্যাট</button>
-      </span>
-    </div>
-    <div class="msgs" id="msgs">
-      <div class="empty" id="emptyState">
-        <div class="big">✦</div>
-        <p><b style="color:var(--text)" data-i18n="emptyTitle">কী নিয়ে কথা বলতে চান?</b></p>
-        <p data-i18n="emptyDesc">উপরে প্রোভাইডার ও মডেল বেছে নিচে মেসেজ লিখুন, বা উপরের বড় প্রম্পট বাক্স থেকেই শুরু করুন।</p>
-        <div class="quick">
-          <button type="button" class="quick-btn" data-q-bn="বাংলায় নিজের পরিচয় দাও — তুমি কোন মডেল, কী কী করতে পারো?" data-q-en="Introduce yourself — which model are you, and what can you do?" data-i18n="q1">তুমি কোন মডেল?</button>
-          <button type="button" class="quick-btn" data-q-bn="ক্রিপ্টো নিয়ে X (Twitter)-এর জন্য ২ লাইনের একটা মজার পোস্ট লিখে দাও" data-q-en="Write a fun 2-line X (Twitter) post about crypto" data-i18n="q2">X পোস্ট লিখে দাও</button>
-          <button type="button" class="quick-btn" data-q-bn="একটা ১ মিনিটের কার্টুন গল্পের আইডিয়া দাও — সবজি চরিত্র দিয়ে" data-q-en="Give me an idea for a 1-minute cartoon story with vegetable characters" data-i18n="q3">কার্টুন গল্পের আইডিয়া</button>
-          <button type="button" class="quick-btn" data-q-bn="সহজ ভাষায় বুঝিয়ে দাও: LLM API কী?" data-q-en="Explain in simple words: what is an LLM API?" data-i18n="q4">LLM API কী?</button>
-        </div>
-      </div>
-    </div>
-    <div class="composer">
-      <div class="composer-row">
-        <textarea id="input" rows="2" data-i18n-ph="inputPh" placeholder="মেসেজ লিখুন… (Enter = পাঠান)"></textarea>
-        <button class="btn btn-primary send-btn" id="btnSend" type="button" aria-label="Send">➤</button>
-      </div>
-      <div style="margin-top:8px;display:none" id="stopRow">
-        <button class="btn btn-danger" id="btnStop" type="button" style="width:100%" data-i18n="stopBtn">■ উত্তর থামান</button>
-      </div>
-      <div class="composer-foot">
-        <span id="chatStatus" data-i18n="ready">প্রস্তুত</span>
-        <span data-i18n="chatFoot">উত্তর সরাসরি প্রোভাইডারের API থেকে আসে • ভুল তথ্য যাচাই করে নিন</span>
-      </div>
-    </div>
-  </section>
+  </details>
 
   <!-- Battle -->
   <section class="card" id="battleSec" aria-label="Battle">
@@ -409,7 +416,7 @@
   </section>
 
   <!-- Model cards -->
-  <section class="card" id="cardsSec" aria-label="Model cards">
+  <details class="card" id="cardsSec"><summary><span data-i18n="cardsTitle">মডেল কার্ড</span> <span class="hint">Model cards</span></summary><div class="body">
     <div class="sec-head">
       <h2 data-i18n="cardsTitle">মডেল কার্ড</h2>
       <span class="hint" id="cardsCount"></span>
@@ -417,7 +424,7 @@
     <p class="sec-sub" data-i18n="cardsDesc">লোড করা মডেলগুলোর প্রথম ১২টা কার্ড আকারে — কার্ড থেকেই সরাসরি চ্যাটে ব্যবহার করুন বা ব্যাটলে পাঠান।</p>
     <div class="cards-grid" id="cardsGrid"></div>
     <p class="hint" id="cardsEmpty" style="margin-top:10px" data-i18n="cardsEmpty">মডেল লোড হলেই এখানে কার্ড দেখা যাবে।</p>
-  </section>
+  </div></details>
 
   <!-- Options -->
   <details class="card" id="optPanel">
@@ -514,7 +521,7 @@
   </section>
 
   <!-- Video -->
-  <section class="card" id="videoSec" aria-label="Video">
+  <details class="card" id="videoSec"><summary><span data-i18n="vidTitle">🎬 ভিডিও বানানো — Video</span> <span class="hint">Video tools</span></summary><div class="body">
     <h2 data-i18n="vidTitle">🎬 ভিডিও বানানো — Video</h2>
     <div class="warnbox" data-i18n="vidWarn">ℹ️ OpenRouter আর FreeLLMAPI API দিয়ে ভিডিও বানানোর সুবিধা দেয় না — ভিডিও বানাতে নিচের ওয়েবসাইটগুলো সরাসরি ব্যবহার করুন। কয়েকটায় ফ্রি ক্রেডিট থাকে, বাকিগুলো পেইড।</div>
     <div class="dir-grid">
@@ -529,10 +536,10 @@
       <div class="tool"><h3>Vidu <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vVidu">ক্যারেক্টার-ভিত্তিক ভিডিওতে ভালো, ফ্রি ক্রেডিট থাকে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://www.vidu.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
       <div class="tool"><h3>fal.ai — Video API <span class="badge badge-paid">PAID</span></h3><p data-i18n="vFal">Kling, Luma, Veo সহ অনেক ভিডিও মডেল এক API দিয়ে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://fal.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
     </div>
-  </section>
+  </div></details>
 
   <!-- Settings -->
-  <details class="card" id="settingsPanel" open>
+  <details class="card" id="settingsPanel">
     <summary><span data-i18n="setTitle">🔑 Settings — API Key</span> <span class="hint" data-i18n="setSub">শুধু আপনার ব্রাউজারেই থাকে</span></summary>
     <div class="body">
       <div class="field">
@@ -597,7 +604,7 @@
   </details>
 
   <!-- Directory -->
-  <section class="card" id="dirSec" aria-label="Directory">
+  <details class="card" id="dirSec"><summary><span data-i18n="dirTitle">📚 সব প্রোভাইডার ও মডেল — ডিরেক্টরি</span> <span class="hint">Directory</span></summary><div class="body">
     <h2 data-i18n="dirTitle">📚 সব প্রোভাইডার ও মডেল — ডিরেক্টরি</h2>
     <p class="sec-sub" data-i18n="dirDesc">চ্যাটের প্রোভাইডারগুলো উপরে সরাসরি চালানো যায়। ছবি/ভিডিওর ওয়েবসাইটগুলো লিংক থেকে খুলে ব্যবহার করুন। FREE মানে সত্যিই ফ্রি টিয়ার আছে, PAID মানে টাকা লাগবে।</p>
     <div class="filters" id="dirFilters">
@@ -626,10 +633,10 @@
       <div class="tool" data-cat="image paid"><h3>OpenRouter Images <span class="badge badge-paid">PAID</span></h3><p data-i18n="tOrImg">GPT Image, FLUX, Gemini Image এক API-তে — ক্রেডিট কাটবে, ফ্রি না।</p><div class="links"><a class="primary" href="https://openrouter.ai/models?output_modalities=image" target="_blank" rel="noopener" data-i18n="modelsLink">মডেল তালিকা</a></div></div>
       <div class="tool" data-cat="video free paid"><h3><span data-i18n="tVidT">ভিডিও টুলসমূহ</span> <span class="badge badge-mix">FREEMIUM + PAID</span></h3><p data-i18n="tVid">Luma, Runway, Kling, Hailuo, Pika, Veo, Sora — পুরো তালিকা উপরের ভিডিও সেকশনে।</p><div class="links"><a class="primary" href="#videoSec" data-i18n="tVidLink">ভিডিও সেকশন দেখুন</a></div></div>
     </div>
-  </section>
+  </div></details>
 
   <!-- Hosting -->
-  <section class="card" id="hostSec" aria-label="Hosting">
+  <details class="card" id="hostSec"><summary><span data-i18n="hostTitle">🌐 ফ্রি ডোমেইন ও হোস্টিং — এই সাইট নিজে চালানোর উপায়</span> <span class="hint">Hosting</span></summary><div class="body">
     <h2 data-i18n="hostTitle">🌐 ফ্রি ডোমেইন ও হোস্টিং — এই সাইট নিজে চালানোর উপায়</h2>
     <p class="sec-sub" data-i18n="hostDesc">এই পেজটা একটা মাত্র HTML ফাইল — নিচের যেকোনো ফ্রি হোস্টিংয়ে আপলোড করলেই নিজের ঠিকানায় লাইভ হয়ে যাবে।</p>
     <div class="host-group">
@@ -660,10 +667,10 @@
       <li data-i18n="hs3">সাথে সাথে আপনার সাইট লাইভ হবে আপনার-নাম.pages.dev ঠিকানায়।</li>
       <li data-i18n="hs4">চাইলে পরে eu.org / is-a.dev-এর ফ্রি ডোমেইনটা কানেক্ট করে নিজের ঠিকানা বসাতে পারবেন।</li>
     </ol>
-  </section>
+  </div></details>
 
   <!-- Guide -->
-  <section class="card guide" id="guideSec" aria-label="Guide">
+  <details class="card guide" id="guideSec"><summary><span data-i18n="guideTitle">📖 সেটআপ গাইড — কোনটা কিভাবে কাজ করে</span> <span class="hint">Guide</span></summary><div class="body">
     <h2 data-i18n="guideTitle">📖 সেটআপ গাইড — কোনটা কিভাবে কাজ করে</h2>
     <h3 style="margin-top:16px;color:var(--accent)" data-i18n="g1T">১) OpenRouter — সবচেয়ে সহজ (২ মিনিট)</h3>
     <ol class="steps">
@@ -693,7 +700,7 @@
     <p data-i18n="g5p">ফ্রি: Pollinations মোড — key লাগে না। পেইড: OpenRouter মোড — ক্রেডিট কাটবে। FreeLLMAPI: সার্ভারে image endpoint থাকলে মডেল ID হাতে লিখে ছবি বানানো যাবে।</p>
     <h3 style="margin-top:18px" data-i18n="gTroubleT">সাধারণ সমস্যা</h3>
     <p data-i18n="gTrouble">401: key ভুল বা মেয়াদ শেষ। 429: ফ্রি লিমিট শেষ — অপেক্ষা করুন বা অন্য মডেল নিন। Failed to fetch: সার্ভার বন্ধ বা URL ভুল। মডেল লিস্ট খালি: ফিল্টার “সব মডেল”-এ রেখে আবার লোড করুন।</p>
-  </section>
+  </div></details>
 
   <p class="foot" data-i18n="foot">Gojo Free LLM Hub • Key শুধু আপনার ব্রাউজারেই থাকে, এই পেজে কোনো key বসানো নেই<br>OpenRouter • FreeLLMAPI • Groq • Cerebras • Mistral</p>
 </div>
@@ -714,7 +721,7 @@
   document.querySelectorAll("[data-i18n]").forEach(function(el){ var k=el.getAttribute("data-i18n"); if(!(k in BN)) BN[k]=el.innerHTML; });
   document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ var k=el.getAttribute("data-i18n-ph"); if(!(k in BN_PH)) BN_PH[k]=el.getAttribute("placeholder")||""; });
   var EN={
-    navBattle:"⚔️ Battle",navLb:"🏆 Leaderboard",navSettings:"🔑 Settings",
+    navBattle:"⚔️ Battle",navLb:"🏆 Leaderboard",navSettings:"🔑 Settings",switchLabel:"⚡ Switch model:",loadAllBtn:"↻ Load all models",pickTitle:"🎛️ Provider & model — details",
     heroTitle:'All AI models, <span>one hub.</span>',
     heroDesc:"Chat with free and paid models from 6 providers, battle two models side by side to see which is better, check the leaderboard rankings — with your own key, entirely in your own browser.",
     stProvider:"Provider:",stModel:"Models:",heroModelLabel:"Model:",heroSend:"Send →",
@@ -726,7 +733,7 @@
     freeOnly:"Show free models only",priceBy:"By price:",pfAll:"All models",pfFree:"Free only",pfPaid:"Paid only",
     modelHint:"Most providers need a key to load the model list. No key? Add one in Settings below.",
     chatTitle:"💬 Chat",curModelLabel:"Current model:",copyBtn:"Copy",clearBtn:"New chat",
-    emptyTitle:"What would you like to talk about?",emptyDesc:"Pick a provider and model above and type below — or start from the big prompt box at the top.",
+    emptyTitle:"What would you like to talk about?",emptyDesc:"Pick any model in one click from the switcher above, then type your message below.",
     stopBtn:"■ Stop response",ready:"Ready",chatFoot:"Answers come straight from the provider's API • Always verify important facts",
     battleTitle:"⚔️ Battle Mode — which model is better?",randomBtn:"🎲 Two random models",
     battleDesc:"Send the same prompt to two models. Answers arrive anonymously — as Model A and Model B. Vote for the one you like, and only then are the real model names revealed.",
@@ -837,6 +844,7 @@
     panelA:$("bpanelA"), panelB:$("bpanelB"),
     lbBody:$("lbBody"), lbEmpty:$("lbEmpty"), cardsGrid:$("cardsGrid"), cardsEmpty:$("cardsEmpty"), cardsCount:$("cardsCount")
   };
+  ["heroInput","heroModel","btnHeroSend"].forEach(function(k){ if(!els[k]) els[k]=document.createElement("div"); });
 
   var state = {
     provider: ORDER.indexOf(lsGet(LS.provider,"openrouter"))!==-1 ? lsGet(LS.provider,"openrouter") : "openrouter",
@@ -938,7 +946,7 @@
       els.modelSelect.value = ids.indexOf(prev)!==-1 ? prev : list[0].id;
     }
     els.modelCountText.textContent = all.length ? (list.length+" / "+all.length + (lang==="en" ? " models" : "টি মডেল")) : "";
-    renderModelMeta(); renderBattleSelects(); renderCards(); renderBoard(); updateStatus();
+    renderModelMeta(); renderBattleSelects(); renderCards(); renderBoard(); updateStatus(); renderQuickSwitch();
   }
   function renderModelMeta(){
     var mid=curModelId();
@@ -1047,6 +1055,59 @@
     });
     els.cardsEmpty.style.display = list.length ? "none" : "block";
     els.cardsCount.textContent = list.length ? (list.length+(lang==="en" ? " models" : "টি মডেল")) : "";
+  }
+  /* ---------- Quick model switcher (in-chat, all providers) ---------- */
+  function allLoadedEntries(){
+    var out=[];
+    ORDER.forEach(function(p){ state.models[p].forEach(function(m){ out.push({p:p, m:m}); }); });
+    return out;
+  }
+  function renderQuickSwitch(){
+    var sel=$("quickSwitch"); if(!sel) return;
+    var entries=allLoadedEntries();
+    var cur=state.provider+"|"+curModelId();
+    sel.innerHTML="";
+    if(!entries.length){
+      var o=document.createElement("option"); o.value="";
+      o.textContent = lang==="en" ? "— Load models, then switch here in one click —" : "— মডেল লোড হলে এখান থেকে এক ক্লিকে বদলান —";
+      sel.appendChild(o); return;
+    }
+    ORDER.forEach(function(p){
+      var list=state.models[p]; if(!list.length) return;
+      var g=document.createElement("optgroup"); g.label=PROVIDERS[p].name+" ("+list.length+")";
+      list.forEach(function(m){
+        var o=document.createElement("option"); o.value=p+"|"+m.id;
+        var tag="";
+        if(PROVIDERS[p].pricing) tag=isFreeOr(m)?"  • FREE":"  • PAID";
+        else if(PROVIDERS[p].tier==="free") tag="  • FREE";
+        o.textContent=m.id+tag; g.appendChild(o);
+      });
+      sel.appendChild(g);
+    });
+    sel.value=cur;
+  }
+  function quickSwitchTo(val){
+    if(!val) return;
+    var i=val.indexOf("|"); if(i<0) return;
+    var p=val.slice(0,i), mid=val.slice(i+1);
+    els.modelSearch.value=""; state.priceFilter="all"; lsSet(LS.priceFilter,"all"); syncPriceFilter();
+    els.chkFree.checked=false; lsSet(LS.freeOnly,"0");
+    if(p!==state.provider){
+      state.provider=p; lsSet(LS.provider,p);
+      els.freeRow.style.display = p==="openrouter" ? "flex" : "none";
+      renderProvGrid();
+    }
+    renderModelOptions();
+    els.modelSelect.value=mid; renderModelMeta(); updateStatus(); renderQuickSwitch();
+    toast("⚡ "+mid);
+  }
+  function stepModel(dir){
+    var entries=allLoadedEntries(); if(!entries.length){ toast(lang==="en" ? "Load models first" : "আগে মডেল লোড করুন"); return; }
+    var cur=state.provider+"|"+curModelId();
+    var idx=-1;
+    entries.forEach(function(e,ix){ if(e.p+"|"+e.m.id===cur) idx=ix; });
+    idx=(idx+dir+entries.length)%entries.length;
+    quickSwitchTo(entries[idx].p+"|"+entries[idx].m.id);
   }
   /* ---------- Battle ---------- */
   function renderBattleSelects(){
@@ -1265,6 +1326,21 @@
   els.heroInput.addEventListener("keydown", function(e){ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); els.btnHeroSend.click(); } });
   document.querySelectorAll(".hero-chip").forEach(function(b){ b.addEventListener("click", function(){ els.heroInput.value=b.getAttribute("data-q"); els.btnHeroSend.click(); }); });
   els.btnLoad.addEventListener("click", function(){ saveSettings(true); loadModels(true); });
+  $("quickSwitch").addEventListener("change", function(){ quickSwitchTo(this.value); });
+  $("btnPrevModel").addEventListener("click", function(){ stepModel(-1); });
+  $("btnNextModel").addEventListener("click", function(){ stepModel(1); });
+  $("btnLoadAll").addEventListener("click", function(){
+    saveSettings(true);
+    var jobs=ORDER.map(function(p){
+      if(p!=="openrouter" && !keyFor(p) && !(p==="custom" && els.customBase.value.trim())) return Promise.resolve([]);
+      return fetchModels(p).catch(function(){ return []; });
+    });
+    Promise.all(jobs).then(function(){
+      renderModelOptions();
+      var n=allLoadedEntries().length;
+      toast(n ? ("⚡ "+n+(lang==="en" ? " models ready — switch in one click" : "টি মডেল তৈরি — এক ক্লিকে বদলান")) : (lang==="en" ? "No models loaded — add a key in Settings" : "মডেল লোড হয়নি — Settings-এ key বসান"));
+    });
+  });
   $("btnRefreshLb").addEventListener("click", function(){
     var jobs = ORDER.filter(function(p){ return p==="openrouter" || keyFor(p) || p==="custom" && els.customBase.value.trim(); }).map(function(p){ return fetchModels(p).catch(function(){ return []; }); });
     Promise.all(jobs).then(function(){ renderModelOptions(); toast(lang==="en" ? "Leaderboard refreshed ✓" : "লিডারবোর্ড রিফ্রেশ হয়েছে ✓"); });
