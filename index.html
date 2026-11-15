@@ -1,554 +1,701 @@
 <!doctype html>
-<html lang="bn">
+<html lang="bn" id="htmlRoot">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="color-scheme" content="dark" />
+<meta name="color-scheme" content="light" />
 <link rel="icon" href="data:," />
 <title>Gojo Free LLM Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0c0e12; --panel:#13161d; --panel2:#181c26; --panel3:#1e2331;
-    --border:#262c3d; --border2:#323a52;
-    --text:#eef1f8; --muted:#9aa3b8; --muted2:#6f788f;
-    --accent:#2dd4a8; --accent-dim:#123f35; --accent-text:#0a1512;
-    --amber:#f5b83d; --amber-bg:#2b2110;
-    --red:#ff6b6b; --red-bg:#2b1416;
-    --blue:#5db4ff; --blue-bg:#12243a;
-    --radius:16px; --radius-sm:10px;
+    --bg:#f7f7f4; --panel:#ffffff; --panel2:#fbfbfa; --panel3:#f1f1ee;
+    --border:#e5e5e0; --border2:#d8d8d2;
+    --text:#12140f; --muted:#5c635a; --muted2:#8a9085;
+    --ink:#12140f; --ink-text:#ffffff;
+    --accent:#0f766e; --accent-soft:#e6f4f1; --accent-border:#bfe3dc;
+    --amber:#9a6a00; --amber-bg:#fdf3d7; --amber-border:#ecd28a;
+    --red:#b42318; --red-bg:#fef1f0; --red-border:#f3c2bd;
+    --blue:#175cd3; --blue-bg:#eff4ff; --blue-border:#b9cdf5;
+    --radius:18px; --radius-sm:12px;
+    --shadow:0 1px 2px rgba(16,24,20,.05),0 8px 28px rgba(16,24,20,.06);
+    --shadow-lg:0 2px 4px rgba(16,24,20,.06),0 18px 48px rgba(16,24,20,.10);
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:"Hind Siliguri",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-  button,[role="button"],select,summary,input:not([type="checkbox"],[type="radio"]),textarea{min-height:40px}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:"Hind Siliguri",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+  button,select,summary,input:not([type="checkbox"],[type="radio"]),textarea{min-height:40px}
   button{cursor:pointer;font-family:inherit}
-  a{color:var(--accent)}
-  .wrap{max-width:960px;margin:0 auto;padding:16px 14px 44px}
-  .head{padding:10px 2px 14px}
-  .head h1{margin:0;font-size:28px;line-height:1.1;font-weight:700;letter-spacing:-.02em}
-  .head h1 span{color:var(--accent)}
-  .head p{margin:6px 0 0;color:var(--muted);font-size:15px;line-height:1.55;max-width:680px}
-  .status-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-  .pill{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:6px 11px;font-size:13px;color:var(--muted)}
-  .dot{width:8px;height:8px;border-radius:50%;background:#555;flex:none}
-  .dot.on{background:var(--accent);box-shadow:0 0 0 3px rgba(45,212,168,.18)}
-  .dot.warn{background:var(--amber)}
-  .navrow{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 2px}
+  a{color:var(--accent);font-weight:600}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 16px 56px}
+  /* Top bar */
+  .topbar{position:sticky;top:0;z-index:50;background:rgba(247,247,244,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);margin:0 -16px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .brand{font-size:17px;font-weight:700;letter-spacing:-.02em;color:var(--text);text-decoration:none}
+  .brand span{color:var(--accent)}
+  .top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .lang-toggle{display:flex;background:#fff;border:1px solid var(--border2);border-radius:999px;padding:3px;gap:3px}
+  .lang-toggle button{border:0;background:transparent;color:var(--muted);border-radius:999px;padding:6px 15px;font-size:13.5px;font-weight:700;min-height:34px;line-height:1}
+  .lang-toggle button.active{background:var(--ink);color:#fff}
+  .top-link{background:#fff;border:1px solid var(--border2);color:var(--text);text-decoration:none;border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600}
+  /* Hero */
+  .hero{text-align:center;padding:52px 8px 8px;max-width:780px;margin:0 auto}
+  .hero h1{margin:0;font-size:42px;line-height:1.12;font-weight:700;letter-spacing:-.03em}
+  .hero h1 span{color:var(--accent)}
+  .hero p{margin:14px auto 0;color:var(--muted);font-size:16.5px;line-height:1.65;max-width:640px}
+  .status-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:18px}
+  .pill{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--muted)}
+  .pill b{color:var(--text)}
+  .dot{width:8px;height:8px;border-radius:50%;background:#c4c4bd;flex:none}
+  .dot.on{background:var(--accent);box-shadow:0 0 0 3px rgba(15,118,110,.16)}
+  .dot.warn{background:#e8a13a}
+  .hero-box{margin:26px auto 0;background:var(--panel);border:1px solid var(--border2);border-radius:24px;box-shadow:var(--shadow-lg);padding:14px;text-align:left}
+  .hero-box textarea{width:100%;border:0;outline:none;resize:none;font-family:inherit;font-size:16.5px;line-height:1.55;color:var(--text);background:transparent;min-height:64px;padding:4px 6px}
+  .hero-box textarea::placeholder{color:var(--muted2)}
+  .hero-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .hero-model{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:7px;min-width:0}
+  .hero-model b{color:var(--text);font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+  .hero-send{background:var(--ink);color:#fff;border:0;border-radius:999px;padding:10px 22px;font-size:15px;font-weight:700;min-height:44px}
+  .hero-send:disabled{opacity:.45}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:16px}
+  .chips button{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:7px 13px;font-size:13.5px;min-height:36px}
+  .chips button:hover{border-color:var(--border2);background:var(--panel2)}
+  .navrow{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin:22px 0 2px}
   .navrow a{background:var(--panel);border:1px solid var(--border);color:var(--text);text-decoration:none;border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600}
-  /* Provider picker */
-  .prov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-  @media(max-width:640px){.prov-grid{grid-template-columns:1fr 1fr}}
-  .prov{border:1px solid var(--border);background:var(--panel);color:var(--muted);border-radius:12px;padding:10px;text-align:left;line-height:1.3}
-  .prov b{display:block;color:var(--text);font-size:14.5px}
-  .prov small{font-size:12px;color:var(--muted2)}
-  .prov.active{border-color:var(--accent);background:var(--panel3)}
-  .prov.active small{color:var(--muted)}
-  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-top:14px}
-  .card h2{margin:0;font-size:17px;font-weight:700}
-  .card h3{margin:0;font-size:15px;font-weight:600}
+  /* Mode tabs */
+  .mode-tabs{display:flex;gap:4px;background:#ececea;border:1px solid var(--border);border-radius:999px;padding:4px;width:fit-content;margin:26px auto 0;max-width:100%;flex-wrap:wrap;justify-content:center}
+  .mode-tabs button{border:0;background:transparent;color:var(--muted);border-radius:999px;padding:9px 20px;font-size:14.5px;font-weight:700;min-height:40px}
+  .mode-tabs button.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(16,24,20,.12)}
+  /* Cards & sections */
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:16px;box-shadow:var(--shadow)}
+  .card h2{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+  .card h3{margin:0;font-size:15.5px;font-weight:600}
+  .sec-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
   .label{font-size:13px;color:var(--muted);font-weight:600;margin-bottom:6px;display:block}
-  .hint{font-size:13px;color:var(--muted2);line-height:1.5}
-  .model-top{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
-  .model-top .grow{flex:1 1 200px;min-width:0}
+  .hint{font-size:13px;color:var(--muted2);line-height:1.55}
+  .sec-sub{color:var(--muted);font-size:14px;line-height:1.6;margin:7px 0 0;max-width:720px}
+  /* Providers */
+  .prov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  @media(max-width:700px){.prov-grid{grid-template-columns:1fr 1fr}}
+  .prov{border:1px solid var(--border);background:var(--panel2);color:var(--muted);border-radius:14px;padding:12px;text-align:left;line-height:1.35}
+  .prov b{display:block;color:var(--text);font-size:15px}
+  .prov small{font-size:12px;color:var(--muted2)}
+  .prov.active{border-color:var(--ink);background:#fff;box-shadow:var(--shadow)}
   select,input[type="text"],input[type="password"],input[type="url"],input[type="number"],textarea{
-    width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:inherit;outline:none
-  }
+    width:100%;background:#fff;border:1px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:10px 12px;font-size:14px;font-family:inherit;outline:none}
   select:focus,input:focus,textarea:focus{border-color:var(--accent)}
   .mono{font-family:"JetBrains Mono",monospace;font-size:12.5px !important}
-  .btn{background:var(--panel3);border:1px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:9px 14px;font-weight:600;font-size:14px;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:40px}
-  .btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+  .btn{background:#fff;border:1px solid var(--border2);color:var(--text);border-radius:999px;padding:9px 16px;font-weight:600;font-size:14px;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;min-height:40px}
+  .btn:hover{background:var(--panel2)}
+  .btn-primary{background:var(--ink);border-color:var(--ink);color:#fff}
+  .btn-primary:hover{background:#2a2d26}
   .btn-primary:disabled{opacity:.5}
-  .btn-ghost{background:transparent}
-  .btn-danger{background:transparent;border-color:#4a2528;color:#ff9a9a}
+  .btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-ghost{background:transparent;border-color:transparent}
+  .btn-danger{background:transparent;border-color:var(--red-border);color:var(--red)}
   .checkrow{display:flex;align-items:center;gap:10px;padding:10px 0 2px;min-height:44px}
   .checkrow input{width:20px;height:20px;accent-color:var(--accent)}
   .checkrow label{font-size:14px}
-  .model-meta{margin-top:10px;display:none;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:13px;line-height:1.6;color:var(--muted)}
+  .model-top{display:flex;gap:8px;flex-wrap:wrap;align-items:end}
+  .model-top .grow{flex:1 1 200px;min-width:0}
+  .model-meta{margin-top:12px;display:none;background:var(--panel2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:11px 13px;font-size:13.5px;line-height:1.65;color:var(--muted)}
   .model-meta b{color:var(--text)}
-  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.02em;padding:2px 7px;border-radius:999px;vertical-align:middle;white-space:nowrap}
-  .badge-free{background:var(--accent-dim);color:var(--accent);border:1px solid #1d5a4a}
-  .badge-paid{background:var(--amber-bg);color:var(--amber);border:1px solid #5a4315}
-  .badge-mix{background:var(--blue-bg);color:var(--blue);border:1px solid #274a6e}
-  .err{display:none;margin-top:10px;background:var(--red-bg);border:1px solid #5a2a2e;color:#ffc9c9;border-radius:var(--radius-sm);padding:10px 12px;font-size:13.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
-  .okmsg{display:none;margin-top:10px;background:var(--accent-dim);border:1px solid #1d5a4a;color:#b9f5e3;border-radius:var(--radius-sm);padding:10px 12px;font-size:13.5px;line-height:1.55}
+  .badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.02em;padding:2px 8px;border-radius:999px;vertical-align:middle;white-space:nowrap}
+  .badge-free{background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border)}
+  .badge-paid{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+  .badge-mix{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue-border)}
+  .err{display:none;margin-top:12px;background:var(--red-bg);border:1px solid var(--red-border);color:#7a1d14;border-radius:var(--radius-sm);padding:11px 13px;font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+  .okmsg{display:none;margin-top:12px;background:var(--accent-soft);border:1px solid var(--accent-border);color:#0b4f47;border-radius:var(--radius-sm);padding:11px 13px;font-size:13.5px;line-height:1.6}
+  .warnbox{background:var(--amber-bg);border:1px solid var(--amber-border);color:#6b4e00;border-radius:var(--radius-sm);padding:12px 14px;font-size:13.5px;line-height:1.65;margin-top:12px}
+  /* Chat */
   .chat-card{padding:0;overflow:hidden;display:flex;flex-direction:column}
-  .chat-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:13px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .chat-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap}
   .chat-head .cur{font-size:13px;color:var(--muted)}
   .chat-head .cur b{color:var(--text);font-family:"JetBrains Mono",monospace;font-size:12px;font-weight:600}
-  .msgs{height:52vh;min-height:320px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#0a0c10}
-  .empty{margin:auto;text-align:center;color:var(--muted2);max-width:420px;padding:20px}
+  .msgs{height:52vh;min-height:320px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;background:var(--panel2)}
+  .empty{margin:auto;text-align:center;color:var(--muted2);max-width:440px;padding:20px}
   .empty .big{font-size:34px;margin-bottom:8px}
-  .empty p{margin:4px 0;font-size:14px;line-height:1.6}
+  .empty p{margin:4px 0;font-size:14.5px;line-height:1.65}
   .quick{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:14px}
-  .quick button{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:999px;padding:7px 12px;font-size:13px;min-height:36px}
-  .msg{max-width:88%;padding:11px 13px;border-radius:14px;font-size:15px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
-  .msg .who{font-size:11.5px;font-weight:700;letter-spacing:.03em;margin-bottom:4px;opacity:.75}
-  .msg.user{align-self:flex-end;background:#173d33;border:1px solid #1f5a49;border-bottom-right-radius:4px}
-  .msg.assistant{align-self:flex-start;background:var(--panel2);border:1px solid var(--border);border-bottom-left-radius:4px}
-  .msg.system{align-self:center;background:var(--blue-bg);border:1px solid #274a6e;color:#cfe8ff;font-size:13.5px;max-width:95%}
-  .msg.error{align-self:center;background:var(--red-bg);border:1px solid #5a2a2e;color:#ffc9c9;font-size:13.5px;max-width:95%}
+  .quick button{background:#fff;border:1px solid var(--border);color:var(--text);border-radius:999px;padding:7px 12px;font-size:13px;min-height:36px}
+  .msg{max-width:88%;padding:11px 14px;border-radius:16px;font-size:15px;line-height:1.65;white-space:pre-wrap;word-break:break-word}
+  .msg .who{font-size:11.5px;font-weight:700;letter-spacing:.03em;margin-bottom:4px;opacity:.65}
+  .msg.user{align-self:flex-end;background:#e9f5f2;border:1px solid var(--accent-border);border-bottom-right-radius:5px}
+  .msg.assistant{align-self:flex-start;background:#fff;border:1px solid var(--border);border-bottom-left-radius:5px}
+  .msg.system{align-self:center;background:var(--blue-bg);border:1px solid var(--blue-border);color:#123a7a;font-size:13.5px;max-width:95%}
+  .msg.error{align-self:center;background:var(--red-bg);border:1px solid var(--red-border);color:#7a1d14;font-size:13.5px;max-width:95%}
   .typing{display:inline-flex;gap:4px;padding:4px 0}
   .typing i{width:7px;height:7px;border-radius:50%;background:var(--muted);display:block;animation:bl 1s infinite}
   .typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
   @keyframes bl{0%,100%{opacity:.25}50%{opacity:1}}
-  .composer{border-top:1px solid var(--border);padding:12px;background:var(--panel)}
+  .composer{border-top:1px solid var(--border);padding:12px;background:#fff}
   .composer-row{display:flex;gap:8px;align-items:flex-end}
   .composer textarea{flex:1;resize:none;max-height:140px;min-height:48px;line-height:1.5}
-  .send-btn{width:52px;height:48px;flex:none;border-radius:12px;font-size:19px;padding:0}
+  .send-btn{width:52px;height:48px;flex:none;border-radius:14px;font-size:19px;padding:0}
   .composer-foot{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:12px;color:var(--muted2);flex-wrap:wrap}
   details.card{padding:0}
-  details.card>summary{list-style:none;padding:16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;font-size:16px;min-height:52px}
+  details.card>summary{list-style:none;padding:18px 20px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;font-weight:700;font-size:16px;min-height:52px}
   details.card>summary::-webkit-details-marker{display:none}
-  details.card .body{padding:0 16px 16px}
+  details.card .body{padding:0 20px 20px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}.msgs{height:48vh}.head h1{font-size:24px}}
   .field{margin-bottom:12px}
   input[type="range"]{width:100%;accent-color:var(--accent);min-height:36px;padding:0;background:transparent;border:none}
-  .range-val{font-family:"JetBrains Mono",monospace;color:var(--accent);font-weight:600}
-  .steps{margin:10px 0 0;padding:0;list-style:none;counter-reset:s}
-  .steps li{counter-increment:s;position:relative;padding:10px 0 10px 40px;border-bottom:1px dashed var(--border);font-size:14.5px;line-height:1.65;color:#d6dbe8}
-  .steps li:last-child{border-bottom:none}
-  .steps li::before{content:counter(s);position:absolute;left:0;top:9px;width:28px;height:28px;border-radius:50%;background:var(--accent-dim);color:var(--accent);border:1px solid #1d5a4a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
-  .steps code,.guide code{font-family:"JetBrains Mono",monospace;background:var(--panel3);border:1px solid var(--border2);border-radius:6px;padding:1px 6px;font-size:12.5px;color:#ffd88a;word-break:break-all}
-  .guide p{font-size:14.5px;line-height:1.7;color:#d6dbe8;margin:8px 0}
-  .warnbox{background:var(--amber-bg);border:1px solid #5a4315;color:#ffe1a1;border-radius:var(--radius-sm);padding:11px 13px;font-size:13.5px;line-height:1.6;margin-top:12px}
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#e8fff6;color:#07251d;padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.45);max-width:92vw;text-align:center}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .foot{margin-top:18px;text-align:center;color:var(--muted2);font-size:12.5px;line-height:1.6;padding:0 8px}
-  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
-  @keyframes sp{to{transform:rotate(360deg)}}
-  /* Directory cards */
+  .range-val{font-family:"JetBrains Mono",monospace;color:var(--accent);font-weight:700}
+  /* Leaderboard */
+  .lb-wrap{margin-top:14px;border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  table.lb{width:100%;border-collapse:collapse;font-size:14px}
+  table.lb th{text-align:left;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);font-weight:700;padding:11px 14px;background:var(--panel2);border-bottom:1px solid var(--border)}
+  table.lb td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+  table.lb tr:last-child td{border-bottom:none}
+  table.lb tbody tr:hover{background:var(--panel2)}
+  .rank{display:inline-flex;width:28px;height:28px;border-radius:50%;background:var(--panel3);align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .rank.top{background:var(--ink);color:#fff}
+  .lb-model{font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:600;word-break:break-all}
+  .lb-use{font-size:12.5px;padding:5px 11px;min-height:32px}
+  @media(max-width:700px){
+    table.lb thead{display:none}
+    table.lb,table.lb tbody,table.lb tr,table.lb td{display:block;width:100%}
+    table.lb tr{padding:10px 4px;border-bottom:1px solid var(--border)}
+    table.lb td{border-bottom:none;padding:4px 14px}
+  }
+  /* Model cards */
+  .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  @media(max-width:900px){.cards-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.cards-grid{grid-template-columns:1fr}}
+  .mcard{border:1px solid var(--border);border-radius:14px;padding:14px;background:var(--panel2);display:flex;flex-direction:column;gap:7px}
+  .mcard .mid{font-family:"JetBrains Mono",monospace;font-size:12.5px;font-weight:600;word-break:break-all;line-height:1.5}
+  .mcard .meta{font-size:12.5px;color:var(--muted);line-height:1.55}
+  .mcard .acts{display:flex;gap:6px;margin-top:auto;flex-wrap:wrap}
+  .mcard .acts button{font-size:12.5px;padding:6px 12px;min-height:34px}
+  /* Battle */
+  .battle-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  @media(max-width:760px){.battle-grid{grid-template-columns:1fr}}
+  .bpanel{border:1px solid var(--border);border-radius:16px;background:var(--panel2);display:flex;flex-direction:column;overflow:hidden}
+  .bpanel.winner{border-color:var(--accent);box-shadow:0 0 0 2px rgba(15,118,110,.25)}
+  .bpanel-head{padding:12px 15px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:8px;background:#fff}
+  .bpanel-head .anon{font-weight:700;font-size:15px}
+  .bpanel-head .reveal{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--accent);font-weight:600;word-break:break-all;text-align:right}
+  .bpanel-body{padding:15px;font-size:14.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;min-height:170px;flex:1}
+  .vote-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  .vote-row button{min-width:130px}
+  .vote-row button.picked{background:var(--accent);border-color:var(--accent);color:#fff}
+  /* Directory / hosting */
   .filters{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
-  .filters button{background:var(--panel2);border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;min-height:36px}
-  .filters button.active{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+  .filters button{background:#fff;border:1px solid var(--border);color:var(--muted);border-radius:999px;padding:7px 13px;font-size:13.5px;font-weight:600;min-height:36px}
+  .filters button.active{background:var(--ink);border-color:var(--ink);color:#fff}
   .dir-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-  @media(max-width:640px){.dir-grid{grid-template-columns:1fr}}
-  .tool{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:13px}
+  @media(max-width:700px){.dir-grid{grid-template-columns:1fr}}
+  .tool{background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:14px}
   .tool h3{font-size:15px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
   .tool p{margin:6px 0 10px;font-size:13.5px;line-height:1.6;color:var(--muted)}
   .tool .links{display:flex;gap:7px;flex-wrap:wrap}
-  .tool .links a{font-size:13px;font-weight:600;text-decoration:none;background:var(--panel3);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:6px 10px}
-  .tool .links a.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
+  .tool .links a{font-size:13px;font-weight:600;text-decoration:none;background:#fff;border:1px solid var(--border2);color:var(--text);border-radius:999px;padding:6px 11px}
+  .tool .links a.primary{background:var(--ink);border-color:var(--ink);color:#fff}
   .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
-  .tag{font-size:11px;color:var(--muted);border:1px solid var(--border2);border-radius:999px;padding:1px 7px}
-  /* Hosting list */
-  .host-group{margin-top:14px}
-  .host-group h3{margin-bottom:4px}
-  .host-line{display:flex;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);font-size:14.5px;line-height:1.6;color:#d6dbe8;flex-wrap:wrap;align-items:baseline}
+  .tag{font-size:11px;color:var(--muted);border:1px solid var(--border2);border-radius:999px;padding:1px 7px;background:#fff}
+  .host-group{margin-top:16px}
+  .host-line{display:flex;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);font-size:14.5px;line-height:1.6;color:#33382f;flex-wrap:wrap;align-items:baseline}
   .host-line:last-child{border-bottom:none}
   .host-line b{color:var(--text);min-width:150px}
-  .host-line .addr{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:#ffd88a}
+  .host-line .addr{font-family:"JetBrains Mono",monospace;font-size:12.5px;color:var(--amber)}
+  .steps{margin:10px 0 0;padding:0;list-style:none;counter-reset:s}
+  .steps li{counter-increment:s;position:relative;padding:10px 0 10px 40px;border-bottom:1px dashed var(--border);font-size:14.5px;line-height:1.65;color:#33382f}
+  .steps li:last-child{border-bottom:none}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:9px;width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .steps code,.guide code{font-family:"JetBrains Mono",monospace;background:var(--panel3);border:1px solid var(--border2);border-radius:6px;padding:1px 6px;font-size:12.5px;color:#7a5200;word-break:break-all}
+  .guide p{font-size:14.5px;line-height:1.7;color:#33382f;margin:8px 0}
   .img-out{margin-top:12px;display:none}
-  .img-out img{width:100%;border-radius:12px;border:1px solid var(--border);display:block;background:var(--panel2)}
+  .img-out img{width:100%;border-radius:14px;border:1px solid var(--border);display:block;background:var(--panel2)}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-weight:600;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:80;box-shadow:0 10px 30px rgba(0,0,0,.25);max-width:92vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .foot{margin-top:22px;text-align:center;color:var(--muted2);font-size:12.5px;line-height:1.7;padding:0 8px}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  @media(max-width:640px){.grid2,.grid3{grid-template-columns:1fr}.msgs{height:48vh}.hero{padding-top:34px}.hero h1{font-size:31px}.hero-model b{max-width:170px}}
   @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}}
 </style>
 </head>
 <body>
 <div class="wrap">
 
-  <header class="head">
-    <h1>Gojo <span>Free LLM Hub</span></h1>
-    <p>এক জায়গা থেকে ৬টা প্রোভাইডারের (OpenRouter, FreeLLMAPI, Groq, Cerebras, Mistral + নিজের Custom) ফ্রি ও পেইড AI মডেলের সাথে চ্যাট, ফ্রিতে ছবি বানানো, ভিডিও টুলের পুরো ডিরেক্টরি — আর এই সাইট নিজে ফ্রিতে হোস্ট করার উপায়। প্রোভাইডার বাছুন, Settings-এ key বসান, মডেল লোড করে শুরু করুন।</p>
-    <div class="status-row">
-      <span class="pill"><span class="dot" id="dotProv"></span> প্রোভাইডার: <b id="stProv" style="color:var(--text)">OpenRouter</b></span>
-      <span class="pill">Key: <b id="stKey" style="color:var(--text)">নেই</b></span>
-      <span class="pill">মডেল: <b id="stCount" style="color:var(--text)">—</b></span>
+  <div class="topbar">
+    <a class="brand" href="#top">Gojo <span>Free LLM Hub</span></a>
+    <div class="top-actions">
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" id="langEnBtn" aria-pressed="false">English</button>
+        <button type="button" id="langBnBtn" class="active" aria-pressed="true">বাংলা</button>
+      </div>
+      <a class="top-link" href="#battleSec" data-i18n="navBattle">⚔️ ব্যাটল</a>
+      <a class="top-link" href="#lbSec" data-i18n="navLb">🏆 লিডারবোর্ড</a>
+      <a class="top-link" href="#settingsPanel" data-i18n="navSettings">🔑 Settings</a>
     </div>
-    <div class="navrow" style="margin-top:12px">
-      <a href="#chatSec">💬 চ্যাট</a><a href="#imageSec">🎨 ছবি বানান</a><a href="#videoSec">🎬 ভিডিও টুল</a><a href="#dirSec">📚 সব প্রোভাইডার</a><a href="#hostSec">🌐 ফ্রি হোস্টিং</a><a href="#guideSec">📖 গাইড</a>
+  </div>
+
+  <header class="hero" id="top">
+    <h1 data-i18n="heroTitle">সব AI মডেল, <span>এক হাবে।</span></h1>
+    <p data-i18n="heroDesc">৬টা প্রোভাইডারের ফ্রি ও পেইড মডেলের সাথে চ্যাট করুন, দুটো মডেলকে পাশাপাশি লড়িয়ে দেখুন কোনটা ভালো, লিডারবোর্ডে র‍্যাংকিং দেখুন — নিজের key দিয়ে, সম্পূর্ণ নিজের ব্রাউজারে।</p>
+    <div class="status-row">
+      <span class="pill"><span class="dot" id="dotProv"></span> <span data-i18n="stProvider">প্রোভাইডার:</span> <b id="stProv">OpenRouter</b></span>
+      <span class="pill">Key: <b id="stKey">নেই</b></span>
+      <span class="pill"><span data-i18n="stModel">মডেল:</span> <b id="stCount">—</b></span>
+    </div>
+    <div class="hero-box">
+      <textarea id="heroInput" rows="3" data-i18n-ph="heroPh" placeholder="যেকোনো কিছু জিজ্ঞেস করুন…"></textarea>
+      <div class="hero-row">
+        <span class="hero-model">⚡ <span data-i18n="heroModelLabel">মডেল:</span> <b id="heroModel">—</b></span>
+        <button class="hero-send" id="btnHeroSend" type="button"><span data-i18n="heroSend">পাঠান →</span></button>
+      </div>
+    </div>
+    <div class="chips">
+      <button type="button" class="hero-chip" data-q-bn="বাংলায় নিজের পরিচয় দাও — তুমি কোন মডেল, কী কী করতে পারো?" data-q-en="Introduce yourself — which model are you, and what can you do?" data-i18n="q1">তুমি কোন মডেল?</button>
+      <button type="button" class="hero-chip" data-q-bn="ক্রিপ্টো নিয়ে X (Twitter)-এর জন্য ২ লাইনের একটা মজার পোস্ট লিখে দাও" data-q-en="Write a fun 2-line X (Twitter) post about crypto" data-i18n="q2">X পোস্ট লিখে দাও</button>
+      <button type="button" class="hero-chip" data-q-bn="একটা ১ মিনিটের কার্টুন গল্পের আইডিয়া দাও — সবজি চরিত্র দিয়ে" data-q-en="Give me an idea for a 1-minute cartoon story with vegetable characters" data-i18n="q3">কার্টুন গল্পের আইডিয়া</button>
+      <button type="button" class="hero-chip" data-q-bn="সহজ ভাষায় বুঝিয়ে দাও: LLM API কী?" data-q-en="Explain in simple words: what is an LLM API?" data-i18n="q4">LLM API কী?</button>
+    </div>
+    <div class="navrow">
+      <a href="#chatSec" data-i18n="navChat">💬 চ্যাট</a><a href="#battleSec" data-i18n="navBattle2">⚔️ ব্যাটল মোড</a><a href="#lbSec" data-i18n="navLb2">🏆 লিডারবোর্ড</a><a href="#imageSec" data-i18n="navImage">🎨 ছবি বানান</a><a href="#videoSec" data-i18n="navVideo">🎬 ভিডিও টুল</a><a href="#dirSec" data-i18n="navDir">📚 সব প্রোভাইডার</a><a href="#hostSec" data-i18n="navHost">🌐 ফ্রি হোস্টিং</a><a href="#guideSec" data-i18n="navGuide">📖 গাইড</a>
     </div>
   </header>
 
+  <div class="mode-tabs" role="tablist">
+    <button type="button" class="mode-tab active" data-mode="chat" data-i18n="tabChat">💬 চ্যাট</button>
+    <button type="button" class="mode-tab" data-mode="battle" data-i18n="tabBattle">⚔️ ব্যাটল</button>
+    <button type="button" class="mode-tab" data-mode="board" data-i18n="tabBoard">🏆 লিডারবোর্ড</button>
+  </div>
+
   <!-- Provider picker -->
-  <section class="card" aria-label="প্রোভাইডার বাছাই">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <h2>প্রোভাইডার বাছাই করুন</h2>
-      <span class="hint">সবগুলোই OpenAI-কম্প্যাটিবল API — একই চ্যাটে চলে</span>
+  <section class="card" aria-label="Provider">
+    <div class="sec-head">
+      <h2 data-i18n="provTitle">প্রোভাইডার বাছাই করুন</h2>
+      <span class="hint" data-i18n="provHint">সবগুলোই OpenAI-কম্প্যাটিবল API — একই চ্যাটে চলে</span>
     </div>
-    <div class="prov-grid" id="provGrid" style="margin-top:12px"></div>
+    <div class="prov-grid" id="provGrid" style="margin-top:14px"></div>
     <div class="model-meta" id="provMeta"></div>
   </section>
 
   <!-- Model picker -->
-  <section class="card" aria-label="মডেল বাছাই">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <h2>মডেল বাছাই করুন</h2>
+  <section class="card" aria-label="Model">
+    <div class="sec-head">
+      <h2 data-i18n="modelTitle">মডেল বাছাই করুন</h2>
       <span class="hint" id="modelCountText"></span>
     </div>
-    <div class="model-top" style="margin-top:12px">
+    <div class="model-top" style="margin-top:14px">
       <div class="grow">
-        <label class="label" for="modelSearch">মডেল খুঁজুন</label>
-        <input type="text" id="modelSearch" placeholder="যেমন: llama, gemini, deepseek, qwen…" autocomplete="off">
+        <label class="label" for="modelSearch" data-i18n="modelSearchLabel">মডেল খুঁজুন</label>
+        <input type="text" id="modelSearch" data-i18n-ph="modelSearchPh" placeholder="যেমন: llama, gemini, deepseek, qwen…" autocomplete="off">
       </div>
       <div class="grow">
-        <label class="label" for="modelSelect">মডেলের তালিকা (লাইভ)</label>
-        <select id="modelSelect" class="mono"><option value="">— আগে মডেল লোড করুন —</option></select>
+        <label class="label" for="modelSelect" data-i18n="modelListLabel">মডেলের তালিকা (লাইভ)</label>
+        <select id="modelSelect" class="mono"><option value="">—</option></select>
       </div>
-      <button class="btn" id="btnLoadModels" type="button">↻ মডেল লোড করুন</button>
+      <button class="btn" id="btnLoadModels" type="button" data-i18n="loadModels">↻ মডেল লোড করুন</button>
     </div>
     <div class="checkrow" id="freeOnlyRow">
       <input type="checkbox" id="chkFreeOnly" checked>
-      <label for="chkFreeOnly">শুধু ফ্রি মডেল দেখাও <span class="hint">(OpenRouter-এ <span class="mono">:free</span> মডেল)</span></label>
+      <label for="chkFreeOnly"><span data-i18n="freeOnly">শুধু ফ্রি মডেল দেখাও</span> <span class="hint">(OpenRouter <span class="mono">:free</span>)</span></label>
     </div>
     <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px" id="priceFilterRow">
-      <span class="hint" style="align-self:center">দাম অনুযায়ী:</span>
-      <button class="btn btn-ghost price-f" data-pf="all" type="button" style="min-height:34px;padding:5px 12px">সব মডেল</button>
-      <button class="btn btn-ghost price-f" data-pf="free" type="button" style="min-height:34px;padding:5px 12px">শুধু ফ্রি</button>
-      <button class="btn btn-ghost price-f" data-pf="paid" type="button" style="min-height:34px;padding:5px 12px">শুধু পেইড</button>
+      <span class="hint" style="align-self:center" data-i18n="priceBy">দাম অনুযায়ী:</span>
+      <button class="btn price-f" data-pf="all" type="button" style="min-height:34px;padding:5px 13px" data-i18n="pfAll">সব মডেল</button>
+      <button class="btn price-f" data-pf="free" type="button" style="min-height:34px;padding:5px 13px" data-i18n="pfFree">শুধু ফ্রি</button>
+      <button class="btn price-f" data-pf="paid" type="button" style="min-height:34px;padding:5px 13px" data-i18n="pfPaid">শুধু পেইড</button>
     </div>
     <div class="model-meta" id="modelMeta"></div>
     <div class="err" id="modelErr"></div>
     <div class="okmsg" id="modelOk"></div>
-    <p class="hint" style="margin:10px 0 0" id="modelHint">মডেল তালিকা লোড করতে বেশিরভাগ প্রোভাইডারে key লাগে। key না থাকলে নিচের Settings-এ বসান — প্রতিটা প্রোভাইডারের “Key নিন” লিংক প্রোভাইডার কার্ডেই আছে।</p>
+    <p class="hint" style="margin:10px 0 0" id="modelHint" data-i18n="modelHint">মডেল তালিকা লোড করতে বেশিরভাগ প্রোভাইডারে key লাগে। key না থাকলে নিচের Settings-এ বসান।</p>
   </section>
 
   <!-- Chat -->
-  <section class="card chat-card" id="chatSec" aria-label="চ্যাট">
+  <section class="card chat-card" id="chatSec" aria-label="Chat">
     <div class="chat-head">
-      <h2 style="font-size:16px">💬 চ্যাট</h2>
-      <span class="cur">এখনকার মডেল: <b id="curModel">কোনোটা বাছাই হয়নি</b></span>
+      <h2 style="font-size:16px" data-i18n="chatTitle">💬 চ্যাট</h2>
+      <span class="cur"><span data-i18n="curModelLabel">এখনকার মডেল:</span> <b id="curModel">—</b></span>
       <span style="display:flex;gap:7px;flex-wrap:wrap">
-        <button class="btn btn-ghost" id="btnCopyChat" type="button">কপি</button>
-        <button class="btn btn-danger" id="btnClear" type="button">নতুন চ্যাট / মুছুন</button>
+        <button class="btn" id="btnCopyChat" type="button" data-i18n="copyBtn">কপি</button>
+        <button class="btn btn-danger" id="btnClear" type="button" data-i18n="clearBtn">নতুন চ্যাট</button>
       </span>
     </div>
     <div class="msgs" id="msgs">
       <div class="empty" id="emptyState">
-        <div class="big">🤖</div>
-        <p><b style="color:var(--text)">কী নিয়ে কথা বলতে চান, গজো?</b></p>
-        <p>উপরে প্রোভাইডার ও মডেল বেছে নিচে মেসেজ লিখুন। একটা দিয়ে শুরু করতে পারেন:</p>
+        <div class="big">✦</div>
+        <p><b style="color:var(--text)" data-i18n="emptyTitle">কী নিয়ে কথা বলতে চান?</b></p>
+        <p data-i18n="emptyDesc">উপরে প্রোভাইডার ও মডেল বেছে নিচে মেসেজ লিখুন, বা উপরের বড় প্রম্পট বাক্স থেকেই শুরু করুন।</p>
         <div class="quick">
-          <button type="button" data-q="বাংলায় নিজের পরিচয় দাও — তুমি কোন মডেল, কী কী করতে পারো?">তুমি কোন মডেল?</button>
-          <button type="button" data-q="ক্রিপ্টো নিয়ে X (Twitter)-এর জন্য ২ লাইনের একটা মজার পোস্ট লিখে দাও">X পোস্ট লিখে দাও</button>
-          <button type="button" data-q="একটা ১ মিনিটের Bangla cartoon গল্পের আইডিয়া দাও — সবজি চরিত্র দিয়ে">কার্টুন গল্পের আইডিয়া</button>
-          <button type="button" data-q="Explain in simple English: what is an LLM API?">LLM API কী?</button>
+          <button type="button" class="quick-btn" data-q-bn="বাংলায় নিজের পরিচয় দাও — তুমি কোন মডেল, কী কী করতে পারো?" data-q-en="Introduce yourself — which model are you, and what can you do?" data-i18n="q1">তুমি কোন মডেল?</button>
+          <button type="button" class="quick-btn" data-q-bn="ক্রিপ্টো নিয়ে X (Twitter)-এর জন্য ২ লাইনের একটা মজার পোস্ট লিখে দাও" data-q-en="Write a fun 2-line X (Twitter) post about crypto" data-i18n="q2">X পোস্ট লিখে দাও</button>
+          <button type="button" class="quick-btn" data-q-bn="একটা ১ মিনিটের কার্টুন গল্পের আইডিয়া দাও — সবজি চরিত্র দিয়ে" data-q-en="Give me an idea for a 1-minute cartoon story with vegetable characters" data-i18n="q3">কার্টুন গল্পের আইডিয়া</button>
+          <button type="button" class="quick-btn" data-q-bn="সহজ ভাষায় বুঝিয়ে দাও: LLM API কী?" data-q-en="Explain in simple words: what is an LLM API?" data-i18n="q4">LLM API কী?</button>
         </div>
       </div>
     </div>
     <div class="composer">
       <div class="composer-row">
-        <textarea id="input" rows="2" placeholder="মেসেজ লিখুন… (Enter = পাঠান, Shift+Enter = নতুন লাইন)"></textarea>
-        <button class="btn btn-primary send-btn" id="btnSend" type="button" aria-label="পাঠান">➤</button>
+        <textarea id="input" rows="2" data-i18n-ph="inputPh" placeholder="মেসেজ লিখুন… (Enter = পাঠান)"></textarea>
+        <button class="btn btn-primary send-btn" id="btnSend" type="button" aria-label="Send">➤</button>
       </div>
       <div style="margin-top:8px;display:none" id="stopRow">
-        <button class="btn btn-danger" id="btnStop" type="button" style="width:100%">■ উত্তর থামান</button>
+        <button class="btn btn-danger" id="btnStop" type="button" style="width:100%" data-i18n="stopBtn">■ উত্তর থামান</button>
       </div>
       <div class="composer-foot">
-        <span id="chatStatus">প্রস্তুত</span>
-        <span>উত্তর সরাসরি প্রোভাইডারের API থেকে আসে • ভুল তথ্য যাচাই করে নিন</span>
+        <span id="chatStatus" data-i18n="ready">প্রস্তুত</span>
+        <span data-i18n="chatFoot">উত্তর সরাসরি প্রোভাইডারের API থেকে আসে • ভুল তথ্য যাচাই করে নিন</span>
       </div>
     </div>
   </section>
 
+  <!-- Battle -->
+  <section class="card" id="battleSec" aria-label="Battle">
+    <div class="sec-head">
+      <h2 data-i18n="battleTitle">⚔️ ব্যাটল মোড — কোন মডেল ভালো?</h2>
+      <button class="btn" id="btnRandomBattle" type="button" data-i18n="randomBtn">🎲 র‍্যান্ডম দুটো মডেল</button>
+    </div>
+    <p class="sec-sub" data-i18n="battleDesc">একই প্রম্পট দুটো মডেলকে পাঠান। উত্তর আসবে নাম গোপন রেখে — Model A আর Model B হিসেবে। যেটা ভালো লাগবে ভোট দিন, তারপরই জানা যাবে কোনটা কোন মডেল।</p>
+    <div class="grid2" style="margin-top:14px">
+      <div class="field" style="margin:0">
+        <label class="label" for="battleA" data-i18n="battleALabel">মডেল A-র জন্য (গোপন থাকবে)</label>
+        <select id="battleA" class="mono"></select>
+      </div>
+      <div class="field" style="margin:0">
+        <label class="label" for="battleB" data-i18n="battleBLabel">মডেল B-র জন্য (গোপন থাকবে)</label>
+        <select id="battleB" class="mono"></select>
+      </div>
+    </div>
+    <p class="hint" style="margin:8px 0 0" data-i18n="battleHint">মডেল তালিকা আসে এখনকার প্রোভাইডারের লোড করা তালিকা থেকে। তালিকা খালি থাকলে উপরে “মডেল লোড করুন” চাপুন। দুটো মডেল একই প্রোভাইডার ও একই key দিয়ে চলবে।</p>
+    <div class="field" style="margin-top:12px">
+      <label class="label" for="battlePrompt" data-i18n="battlePromptLabel">ব্যাটলের প্রম্পট</label>
+      <textarea id="battlePrompt" rows="2" data-i18n-ph="battlePh" placeholder="একটা প্রশ্ন লিখুন — দুটো মডেলই উত্তর দেবে…"></textarea>
+    </div>
+    <button class="btn btn-primary" id="btnBattle" type="button" style="width:100%" data-i18n="battleGo">⚔️ ব্যাটল শুরু করুন</button>
+    <div class="err" id="battleErr"></div>
+    <div id="battleArena" style="display:none">
+      <div class="battle-grid">
+        <div class="bpanel" id="bpanelA">
+          <div class="bpanel-head"><span class="anon">Model A</span><span class="reveal" id="revealA"></span></div>
+          <div class="bpanel-body" id="battleOutA"></div>
+        </div>
+        <div class="bpanel" id="bpanelB">
+          <div class="bpanel-head"><span class="anon">Model B</span><span class="reveal" id="revealB"></span></div>
+          <div class="bpanel-body" id="battleOutB"></div>
+        </div>
+      </div>
+      <div class="vote-row" id="voteRow" style="display:none">
+        <button class="btn" id="voteA" type="button" data-i18n="voteA">👈 A ভালো</button>
+        <button class="btn" id="voteTie" type="button" data-i18n="voteTie">🤝 দুটোই সমান</button>
+        <button class="btn" id="voteB" type="button" data-i18n="voteB">B ভালো 👉</button>
+      </div>
+      <div class="okmsg" id="battleResult"></div>
+      <button class="btn" id="btnNewBattle" type="button" style="width:100%;margin-top:12px;display:none" data-i18n="newBattle">🔀 নতুন ব্যাটল</button>
+    </div>
+  </section>
+
+  <!-- Leaderboard -->
+  <section class="card" id="lbSec" aria-label="Leaderboard">
+    <div class="sec-head">
+      <h2 data-i18n="lbTitle">🏆 মডেল লিডারবোর্ড</h2>
+      <button class="btn" id="btnRefreshLb" type="button" data-i18n="lbRefresh">↻ সব প্রোভাইডার লোড করুন</button>
+    </div>
+    <p class="sec-sub" data-i18n="lbDesc">র‍্যাংকিং তৈরি হয় লাইভ মডেল তালিকা থেকে — কনটেক্সট উইন্ডো যত বড়, র‍্যাংক তত উপরে। ব্যাটলে জিতলে সেই মডেলের জয়ের সংখ্যা এখানে বাড়ে (এই সেশনেই গোনা হয়)।</p>
+    <div class="lb-wrap">
+      <table class="lb">
+        <thead><tr>
+          <th data-i18n="lbRank">র‍্যাংক</th><th data-i18n="lbModel">মডেল</th><th data-i18n="lbProvider">প্রোভাইডার</th><th data-i18n="lbPrice">দাম</th><th data-i18n="lbCtx">কনটেক্সট</th><th data-i18n="lbWins">ব্যাটল জয়</th><th></th>
+        </tr></thead>
+        <tbody id="lbBody"></tbody>
+      </table>
+    </div>
+    <p class="hint" id="lbEmpty" style="margin-top:10px" data-i18n="lbEmpty">এখনো কোনো মডেল লোড হয়নি। উপরে প্রোভাইডার বেছে “মডেল লোড করুন” চাপুন — লিডারবোর্ড নিজে থেকেই ভরে যাবে।</p>
+  </section>
+
+  <!-- Model cards -->
+  <section class="card" id="cardsSec" aria-label="Model cards">
+    <div class="sec-head">
+      <h2 data-i18n="cardsTitle">মডেল কার্ড</h2>
+      <span class="hint" id="cardsCount"></span>
+    </div>
+    <p class="sec-sub" data-i18n="cardsDesc">লোড করা মডেলগুলোর প্রথম ১২টা কার্ড আকারে — কার্ড থেকেই সরাসরি চ্যাটে ব্যবহার করুন বা ব্যাটলে পাঠান।</p>
+    <div class="cards-grid" id="cardsGrid"></div>
+    <p class="hint" id="cardsEmpty" style="margin-top:10px" data-i18n="cardsEmpty">মডেল লোড হলেই এখানে কার্ড দেখা যাবে।</p>
+  </section>
+
   <!-- Options -->
   <details class="card" id="optPanel">
-    <summary>⚙️ অপশন <span class="hint">Temperature, Max Tokens, System Prompt</span></summary>
+    <summary><span data-i18n="optTitle">⚙️ অপশন</span> <span class="hint">Temperature, Max Tokens, System Prompt</span></summary>
     <div class="body">
       <div class="grid2">
         <div class="field">
           <label class="label" for="rngTemp">Temperature — <span class="range-val" id="tempVal">0.7</span></label>
           <input type="range" id="rngTemp" min="0" max="2" step="0.1" value="0.7">
-          <div class="hint">কম = সোজাসাপ্টা ও নির্ভুল • বেশি = সৃজনশীল ও এলোমেলো</div>
+          <div class="hint" data-i18n="tempHint">কম = সোজাসাপ্টা ও নির্ভুল • বেশি = সৃজনশীল</div>
         </div>
         <div class="field">
-          <label class="label" for="numTokens">সর্বোচ্চ টোকেন (Max Tokens)</label>
+          <label class="label" for="numTokens" data-i18n="tokensLabel">সর্বোচ্চ টোকেন (Max Tokens)</label>
           <input type="number" id="numTokens" min="64" max="32000" step="64" value="2048">
-          <div class="hint">উত্তর কত লম্বা হতে পারবে। খালি রাখলে মডেলের ডিফল্ট।</div>
+          <div class="hint" data-i18n="tokensHint">উত্তর কত লম্বা হতে পারবে।</div>
         </div>
       </div>
       <div class="field" style="margin-bottom:4px">
-        <label class="label" for="txtSystem">সিস্টেম প্রম্পট (System Prompt)</label>
-        <textarea id="txtSystem" rows="3" placeholder="যেমন: তুমি একজন সহায়ক অ্যাসিস্ট্যান্ট। সবসময় বাংলায়, ছোট করে উত্তর দাও।">তুমি একজন সহায়ক AI অ্যাসিস্ট্যান্ট। ব্যবহারকারী বাংলায় লিখলে বাংলায় উত্তর দাও, ইংরেজিতে লিখলে ইংরেজিতে।</textarea>
-        <div class="hint">প্রতিটা উত্তরের ধরন ঠিক করে দেয়। খালি রাখলে কোনো সিস্টেম নির্দেশ যাবে না।</div>
+        <label class="label" for="txtSystem" data-i18n="sysLabel">সিস্টেম প্রম্পট (System Prompt)</label>
+        <textarea id="txtSystem" rows="3">তুমি একজন সহায়ক AI অ্যাসিস্ট্যান্ট। ব্যবহারকারী বাংলায় লিখলে বাংলায় উত্তর দাও, ইংরেজিতে লিখলে ইংরেজিতে।</textarea>
+        <div class="hint" data-i18n="sysHint">প্রতিটা উত্তরের ধরন ঠিক করে দেয়। খালি রাখলে কোনো সিস্টেম নির্দেশ যাবে না।</div>
       </div>
       <div class="checkrow">
         <input type="checkbox" id="chkStream" checked>
-        <label for="chkStream">স্ট্রিমিং উত্তর (শব্দে শব্দে আসবে)</label>
+        <label for="chkStream" data-i18n="streamLabel">স্ট্রিমিং উত্তর (শব্দে শব্দে আসবে)</label>
       </div>
     </div>
   </details>
 
   <!-- Image Studio -->
-  <section class="card" id="imageSec" aria-label="ছবি বানানো">
-    <h2>🎨 ছবি বানান — Image Studio</h2>
-    <p class="hint" style="margin:8px 0 0">তিনভাবে ছবি বানানো যায় এখানে: <b style="color:var(--text)">OpenRouter Images API</b> (আপনার key দিয়ে, ক্রেডিট কাটবে), <b style="color:var(--text)">FreeLLMAPI</b> (আপনার সার্ভারে image মডেল থাকলে), আর <b style="color:var(--text)">Pollinations</b> (সম্পূর্ণ ফ্রি, key লাগে না)।</p>
-    <div class="warnbox">💰 <b>সৎ কথা:</b> OpenRouter-এর কোনো image মডেলই ফ্রি না — ছবি বানালে আপনার OpenRouter অ্যাকাউন্টের <b>ক্রেডিট ব্যালান্স</b> থেকে টাকা কাটবে। একদম ফ্রিতে ছবি চাইলে নিচে Pollinations মোড বাছুন।</div>
+  <section class="card" id="imageSec" aria-label="Image Studio">
+    <div class="sec-head"><h2 data-i18n="imgTitle">🎨 ছবি বানান — Image Studio</h2></div>
+    <p class="sec-sub" data-i18n="imgDesc">তিনভাবে ছবি বানানো যায়: OpenRouter Images API (আপনার key, ক্রেডিট কাটবে), FreeLLMAPI (নিজের সার্ভারে image মডেল থাকলে), আর Pollinations (সম্পূর্ণ ফ্রি, key লাগে না)।</p>
+    <div class="warnbox" data-i18n="imgWarn">💰 OpenRouter-এর কোনো image মডেলই ফ্রি না — ছবি বানালে ক্রেডিট কাটবে। একদম ফ্রি চাইলে Pollinations মোড বাছুন।</div>
     <div class="grid2" style="margin-top:14px">
       <div class="field">
-        <label class="label" for="imgMode">ছবি বানানোর মাধ্যম</label>
+        <label class="label" for="imgMode" data-i18n="imgModeLabel">ছবি বানানোর মাধ্যম</label>
         <select id="imgMode">
-          <option value="pollinations">Pollinations — সম্পূর্ণ ফ্রি, key লাগে না</option>
-          <option value="openrouter">OpenRouter Images API — পেইড (ক্রেডিট কাটবে)</option>
-          <option value="freellmapi">FreeLLMAPI — নিজের সার্ভার দিয়ে</option>
+          <option value="pollinations">Pollinations — FREE, no key</option>
+          <option value="openrouter">OpenRouter Images API — PAID</option>
+          <option value="freellmapi">FreeLLMAPI — self-hosted</option>
         </select>
       </div>
       <div class="field" id="imgModelWrap">
-        <label class="label" for="imgModelSelect">Image মডেল (OpenRouter থেকে লাইভ)</label>
+        <label class="label" for="imgModelSelect" data-i18n="imgModelLabel">Image মডেল (OpenRouter থেকে লাইভ)</label>
         <div style="display:flex;gap:7px">
-          <select id="imgModelSelect" class="mono" style="flex:1"><option value="">— মডেল লোড করুন —</option></select>
-          <button class="btn" id="btnLoadImgModels" type="button">↻ লোড</button>
+          <select id="imgModelSelect" class="mono" style="flex:1"><option value="">—</option></select>
+          <button class="btn" id="btnLoadImgModels" type="button" data-i18n="loadShort">↻ লোড</button>
         </div>
-        <input type="text" id="imgModelManual" class="mono" placeholder="বা মডেল ID হাতে লিখুন, যেমন: black-forest-labs/flux.2-pro" style="margin-top:7px" autocomplete="off" spellcheck="false">
-        <div class="hint">তালিকা আসে <span class="mono">GET /api/v1/images/models</span> থেকে; ছবি তৈরি হয় <span class="mono">POST /api/v1/images</span> দিয়ে। FreeLLMAPI মোডে মডেল ID হাতে লিখুন।</div>
+        <input type="text" id="imgModelManual" class="mono" placeholder="black-forest-labs/flux.2-pro" style="margin-top:7px" autocomplete="off" spellcheck="false">
+        <div class="hint" data-i18n="imgModelHint">FreeLLMAPI মোডে মডেল ID হাতে লিখুন।</div>
       </div>
     </div>
     <div class="field">
-      <label class="label" for="imgPrompt">ছবির বর্ণনা (Prompt) — ইংরেজিতে লিখলে ফল ভালো হয়</label>
-      <textarea id="imgPrompt" rows="3" placeholder="যেমন: a cute cartoon carrot king wearing a golden crown, colorful, for kids storybook">a cute cartoon carrot king wearing a golden crown, colorful storybook illustration, bright and cheerful</textarea>
+      <label class="label" for="imgPrompt" data-i18n="imgPromptLabel">ছবির বর্ণনা (Prompt) — ইংরেজিতে লিখলে ফল ভালো হয়</label>
+      <textarea id="imgPrompt" rows="3">a cute cartoon carrot king wearing a golden crown, colorful storybook illustration, bright and cheerful</textarea>
     </div>
     <div class="grid3">
       <div class="field">
-        <label class="label" for="imgSize">সাইজ</label>
+        <label class="label" for="imgSize" data-i18n="imgSizeLabel">সাইজ</label>
         <select id="imgSize">
-          <option value="1024x1024">1024 × 1024 (বর্গ)</option>
-          <option value="1536x1024">1536 × 1024 (চওড়া)</option>
-          <option value="1024x1536">1024 × 1536 (লম্বা)</option>
-          <option value="1792x1024">1792 × 1024 (ওয়াইড)</option>
-          <option value="1024x1792">1024 × 1792 (পোর্ট্রেট)</option>
+          <option value="1024x1024">1024 × 1024</option><option value="1536x1024">1536 × 1024</option><option value="1024x1536">1024 × 1536</option><option value="1792x1024">1792 × 1024</option><option value="1024x1792">1024 × 1792</option>
         </select>
       </div>
       <div class="field">
-        <label class="label" for="imgAspect">অ্যাসপেক্ট রেশিও</label>
-        <select id="imgAspect">
-          <option value="1:1">1:1 — বর্গ</option>
-          <option value="16:9">16:9 — ভিডিও/থাম্বনেইল</option>
-          <option value="9:16">9:16 — Shorts / Reels</option>
-          <option value="4:3">4:3</option>
-          <option value="3:4">3:4</option>
-        </select>
+        <label class="label" for="imgAspect" data-i18n="imgAspectLabel">অ্যাসপেক্ট রেশিও</label>
+        <select id="imgAspect"><option value="1:1">1:1</option><option value="16:9">16:9</option><option value="9:16">9:16</option><option value="4:3">4:3</option><option value="3:4">3:4</option></select>
       </div>
       <div class="field">
-        <label class="label" for="imgPolliModel">Pollinations মডেল (ফ্রি মোডে)</label>
-        <select id="imgPolliModel">
-          <option value="flux">FLUX — সেরা মান</option>
-          <option value="turbo">Turbo — দ্রুত</option>
-        </select>
+        <label class="label" for="imgPolliModel" data-i18n="imgPolliLabel">Pollinations মডেল (ফ্রি মোডে)</label>
+        <select id="imgPolliModel"><option value="flux">FLUX</option><option value="turbo">Turbo</option></select>
       </div>
     </div>
-    <button class="btn btn-primary" id="btnGenImg" type="button" style="width:100%">🎨 ছবি বানান</button>
+    <button class="btn btn-accent" id="btnGenImg" type="button" style="width:100%" data-i18n="imgGen">🎨 ছবি বানান</button>
     <div class="err" id="imgErr"></div>
     <div class="okmsg" id="imgOk"></div>
     <div class="img-out" id="imgOut">
-      <img id="imgResult" alt="AI দিয়ে বানানো ছবি">
+      <img id="imgResult" alt="AI generated image">
       <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:9px">
-        <a class="btn btn-primary" id="imgDownload" href="#" download="gojo-ai-image.jpg" target="_blank" rel="noopener">⬇ ছবি ডাউনলোড / খুলুন</a>
-        <button class="btn" id="btnImgAgain" type="button">🔀 আরেকটা ভার্সন</button>
+        <a class="btn btn-primary" id="imgDownload" href="#" download="gojo-ai-image.jpg" target="_blank" rel="noopener" data-i18n="imgDl">⬇ ছবি ডাউনলোড / খুলুন</a>
+        <button class="btn" id="btnImgAgain" type="button" data-i18n="imgAgain">🔀 আরেকটা ভার্সন</button>
       </div>
       <p class="hint" id="imgMeta" style="margin-top:7px"></p>
     </div>
-    <h3 style="margin-top:18px">আরও ছবি বানানোর ওয়েবসাইট</h3>
+    <h3 style="margin-top:20px" data-i18n="imgMore">আরও ছবি বানানোর ওয়েবসাইট</h3>
     <div class="dir-grid">
-      <div class="tool"><h3>Leonardo AI <span class="badge badge-mix">FREEMIUM</span></h3><p>ওয়েবসাইটেই ছবি বানানো, ফ্রি দৈনিক টোকেন থাকে।</p><div class="links"><a class="primary" href="https://leonardo.ai" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Ideogram <span class="badge badge-mix">FREEMIUM</span></h3><p>ছবির ভেতর লেখা (text) বানাতে সেরা, ফ্রি প্ল্যান আছে।</p><div class="links"><a class="primary" href="https://ideogram.ai" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Google Gemini / Imagen <span class="badge badge-mix">FREEMIUM</span></h3><p>Gemini অ্যাপ ও AI Studio থেকে ছবি বানানো যায়।</p><div class="links"><a class="primary" href="https://aistudio.google.com" target="_blank" rel="noopener">AI Studio</a></div></div>
-      <div class="tool"><h3>Midjourney <span class="badge badge-paid">PAID</span></h3><p>সবচেয়ে সুন্দর আর্ট-স্টাইল ছবি, শুধু পেইড প্ল্যান।</p><div class="links"><a class="primary" href="https://www.midjourney.com" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>fal.ai <span class="badge badge-paid">PAID</span></h3><p>FLUX সহ অনেক image মডেলের API, ব্যবহার অনুযায়ী পেমেন্ট।</p><div class="links"><a class="primary" href="https://fal.ai" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Replicate <span class="badge badge-paid">PAID</span></h3><p>হাজারো image মডেল API দিয়ে চালানো যায়, রান অনুযায়ী খরচ।</p><div class="links"><a class="primary" href="https://replicate.com" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Leonardo AI <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="dLeo">ওয়েবসাইটেই ছবি বানানো, ফ্রি দৈনিক টোকেন থাকে।</p><div class="links"><a class="primary" href="https://leonardo.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Ideogram <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="dIdeo">ছবির ভেতর লেখা বানাতে সেরা, ফ্রি প্ল্যান আছে।</p><div class="links"><a class="primary" href="https://ideogram.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Google Gemini / Imagen <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="dGemImg">Gemini অ্যাপ ও AI Studio থেকে ছবি বানানো যায়।</p><div class="links"><a class="primary" href="https://aistudio.google.com" target="_blank" rel="noopener">AI Studio</a></div></div>
+      <div class="tool"><h3>Midjourney <span class="badge badge-paid">PAID</span></h3><p data-i18n="dMj">সবচেয়ে সুন্দর আর্ট-স্টাইল ছবি, শুধু পেইড প্ল্যান।</p><div class="links"><a class="primary" href="https://www.midjourney.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>fal.ai <span class="badge badge-paid">PAID</span></h3><p data-i18n="dFal">FLUX সহ অনেক image মডেলের API, ব্যবহার অনুযায়ী পেমেন্ট।</p><div class="links"><a class="primary" href="https://fal.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Replicate <span class="badge badge-paid">PAID</span></h3><p data-i18n="dRep">হাজারো image মডেল API দিয়ে চালানো যায়, রান অনুযায়ী খরচ।</p><div class="links"><a class="primary" href="https://replicate.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
     </div>
   </section>
 
   <!-- Video -->
-  <section class="card" id="videoSec" aria-label="ভিডিও বানানো">
-    <h2>🎬 ভিডিও বানানো — Video</h2>
-    <div class="warnbox">ℹ️ <b>সৎ কথা:</b> এই হাবের দুই মূল প্রোভাইডার — <b>OpenRouter আর FreeLLMAPI — API দিয়ে ভিডিও বানানোর সুবিধা দেয় না</b>, তাই এখান থেকে সরাসরি API দিয়ে ভিডিও বানানো যাবে না। ভিডিও বানাতে নিচের ওয়েবসাইটগুলো সরাসরি ব্যবহার করুন — প্রতিটার লিংক দেওয়া আছে, কয়েকটায় ফ্রি প্ল্যান/ক্রেডিট থাকে, বাকিগুলো পেইড।</div>
+  <section class="card" id="videoSec" aria-label="Video">
+    <h2 data-i18n="vidTitle">🎬 ভিডিও বানানো — Video</h2>
+    <div class="warnbox" data-i18n="vidWarn">ℹ️ OpenRouter আর FreeLLMAPI API দিয়ে ভিডিও বানানোর সুবিধা দেয় না — ভিডিও বানাতে নিচের ওয়েবসাইটগুলো সরাসরি ব্যবহার করুন। কয়েকটায় ফ্রি ক্রেডিট থাকে, বাকিগুলো পেইড।</div>
     <div class="dir-grid">
-      <div class="tool"><h3>Luma Dream Machine <span class="badge badge-mix">FREEMIUM</span></h3><p>টেক্সট/ছবি থেকে সুন্দর ভিডিও, ফ্রি ক্রেডিট দিয়ে শুরু করা যায়।</p><div class="tags"><span class="tag">Text-to-Video</span><span class="tag">Image-to-Video</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://lumalabs.ai/dream-machine" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Runway <span class="badge badge-mix">FREEMIUM</span></h3><p>Gen-3/Gen-4 ভিডিও মডেল, প্রফেশনাল এডিটিং টুলসহ। ফ্রি ট্রায়াল ক্রেডিট থাকে।</p><div class="tags"><span class="tag">Text-to-Video</span><span class="tag">এডিটর</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://runwayml.com" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Kling AI <span class="badge badge-mix">FREEMIUM</span></h3><p>লম্বা ও রিয়েলিস্টিক ভিডিও, দৈনিক ফ্রি ক্রেডিট থাকে।</p><div class="tags"><span class="tag">Text-to-Video</span><span class="tag">Image-to-Video</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://klingai.com" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Hailuo AI (MiniMax) <span class="badge badge-mix">FREEMIUM</span></h3><p>দ্রুত ভালো মানের ভিডিও, ফ্রি ক্রেডিট থাকে।</p><div class="tags"><span class="tag">Text-to-Video</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://hailuoai.video" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Pika <span class="badge badge-mix">FREEMIUM</span></h3><p>মজার ইফেক্টসহ ছোট ভিডিও বানাতে জনপ্রিয়, ফ্রি প্ল্যান আছে।</p><div class="tags"><span class="tag">Text-to-Video</span><span class="tag">ইফেক্ট</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://pika.art" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>PixVerse <span class="badge badge-mix">FREEMIUM</span></h3><p>দৈনিক ফ্রি ক্রেডিট, Shorts-এর জন্য ভালো।</p><div class="tags"><span class="tag">Text-to-Video</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://pixverse.ai" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Google Veo (Gemini) <span class="badge badge-paid">PAID</span></h3><p>Google-এর Veo ভিডিও মডেল — Gemini / AI Studio-র পেইড প্ল্যানে পাওয়া যায়।</p><div class="tags"><span class="tag">Text-to-Video</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://aistudio.google.com" target="_blank" rel="noopener">AI Studio</a></div></div>
-      <div class="tool"><h3>OpenAI Sora <span class="badge badge-paid">PAID</span></h3><p>OpenAI-এর ভিডিও মডেল, ChatGPT-র পেইড প্ল্যানে।</p><div class="tags"><span class="tag">Text-to-Video</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://sora.com" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>Vidu <span class="badge badge-mix">FREEMIUM</span></h3><p>ক্যারেক্টার-ভিত্তিক ভিডিওতে ভালো, ফ্রি ক্রেডিট থাকে।</p><div class="tags"><span class="tag">Text-to-Video</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://www.vidu.com" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
-      <div class="tool"><h3>fal.ai — Video API <span class="badge badge-paid">PAID</span></h3><p>Kling, Luma, Veo সহ অনেক ভিডিও মডেল এক API দিয়ে, ব্যবহার অনুযায়ী খরচ।</p><div class="tags"><span class="tag">API</span></div><div class="links" style="margin-top:9px"><a class="primary" href="https://fal.ai" target="_blank" rel="noopener">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Luma Dream Machine <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vLuma">টেক্সট/ছবি থেকে সুন্দর ভিডিও, ফ্রি ক্রেডিট দিয়ে শুরু করা যায়।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://lumalabs.ai/dream-machine" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Runway <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vRun">Gen-3/Gen-4 ভিডিও মডেল, প্রফেশনাল এডিটিং টুলসহ।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://runwayml.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Kling AI <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vKling">লম্বা ও রিয়েলিস্টিক ভিডিও, দৈনিক ফ্রি ক্রেডিট থাকে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://klingai.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Hailuo AI (MiniMax) <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vHai">দ্রুত ভালো মানের ভিডিও, ফ্রি ক্রেডিট থাকে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://hailuoai.video" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Pika <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vPika">মজার ইফেক্টসহ ছোট ভিডিও, ফ্রি প্ল্যান আছে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://pika.art" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>PixVerse <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vPix">দৈনিক ফ্রি ক্রেডিট, Shorts-এর জন্য ভালো।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://pixverse.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Google Veo (Gemini) <span class="badge badge-paid">PAID</span></h3><p data-i18n="vVeo">Google-এর Veo ভিডিও মডেল — পেইড প্ল্যানে পাওয়া যায়।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://aistudio.google.com" target="_blank" rel="noopener">AI Studio</a></div></div>
+      <div class="tool"><h3>OpenAI Sora <span class="badge badge-paid">PAID</span></h3><p data-i18n="vSora">OpenAI-এর ভিডিও মডেল, ChatGPT-র পেইড প্ল্যানে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://sora.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>Vidu <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="vVidu">ক্যারেক্টার-ভিত্তিক ভিডিওতে ভালো, ফ্রি ক্রেডিট থাকে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://www.vidu.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool"><h3>fal.ai — Video API <span class="badge badge-paid">PAID</span></h3><p data-i18n="vFal">Kling, Luma, Veo সহ অনেক ভিডিও মডেল এক API দিয়ে।</p><div class="links" style="margin-top:9px"><a class="primary" href="https://fal.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
     </div>
   </section>
 
   <!-- Settings -->
   <details class="card" id="settingsPanel" open>
-    <summary>🔑 Settings — API Key <span class="hint">শুধু আপনার ব্রাউজারেই থাকে</span></summary>
+    <summary><span data-i18n="setTitle">🔑 Settings — API Key</span> <span class="hint" data-i18n="setSub">শুধু আপনার ব্রাউজারেই থাকে</span></summary>
     <div class="body">
       <div class="field">
-        <label class="label" for="keyOr">OpenRouter API Key <span class="badge badge-mix">FREE + PAID মডেল</span></label>
+        <label class="label" for="keyOr">OpenRouter API Key <span class="badge badge-mix">FREE + PAID</span></label>
         <input type="password" id="keyOr" class="mono" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false">
-        <div class="hint">ফ্রি key পেতে: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a> — <span class="mono">:free</span> মডেল ফ্রি, বাকিগুলোতে ক্রেডিট কাটবে।</div>
+        <div class="hint"><span data-i18n="orKeyHint">ফ্রি key পেতে:</span> <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a> — <span class="mono">:free</span> <span data-i18n="orKeyHint2">মডেল ফ্রি, বাকিগুলোতে ক্রেডিট কাটবে।</span></div>
       </div>
       <div class="grid2">
         <div class="field">
           <label class="label" for="keyGroq">Groq API Key <span class="badge badge-free">FREE TIER</span></label>
           <input type="password" id="keyGroq" class="mono" placeholder="gsk_…" autocomplete="off" spellcheck="false">
-          <div class="hint">ফ্রি key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> • API: <span class="mono">api.groq.com/openai/v1</span></div>
+          <div class="hint"><span data-i18n="freeKey">ফ্রি key:</span> <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a></div>
         </div>
         <div class="field">
           <label class="label" for="keyCerebras">Cerebras API Key <span class="badge badge-free">FREE TIER</span></label>
           <input type="password" id="keyCerebras" class="mono" placeholder="csk-…" autocomplete="off" spellcheck="false">
-          <div class="hint">ফ্রি key: <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener">cloud.cerebras.ai</a> • API: <span class="mono">api.cerebras.ai/v1</span></div>
+          <div class="hint"><span data-i18n="freeKey">ফ্রি key:</span> <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener">cloud.cerebras.ai</a></div>
         </div>
         <div class="field">
           <label class="label" for="keyMistral">Mistral API Key <span class="badge badge-mix">FREE TIER + PAID</span></label>
           <input type="password" id="keyMistral" class="mono" placeholder="…" autocomplete="off" spellcheck="false">
-          <div class="hint">Key: <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">console.mistral.ai/api-keys</a> • API: <span class="mono">api.mistral.ai/v1</span></div>
+          <div class="hint">Key: <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">console.mistral.ai/api-keys</a></div>
         </div>
         <div class="field">
           <label class="label" for="keyFl">FreeLLMAPI Unified Key <span class="badge badge-free">FREE • SELF-HOSTED</span></label>
           <input type="password" id="keyFl" class="mono" placeholder="freellmapi-…" autocomplete="off" spellcheck="false">
-          <div class="hint">FreeLLMAPI ড্যাশবোর্ড থেকে পাওয়া একটাই key — সব প্রোভাইডারের জন্য।</div>
+          <div class="hint" data-i18n="flKeyHint">FreeLLMAPI ড্যাশবোর্ড থেকে পাওয়া একটাই key — সব প্রোভাইডারের জন্য।</div>
         </div>
       </div>
       <div class="field">
         <label class="label" for="flBase">FreeLLMAPI Base URL</label>
         <input type="url" id="flBase" class="mono" value="http://localhost:3001/v1" autocomplete="off" spellcheck="false">
-        <div class="hint">ডিফল্ট: <span class="mono">http://localhost:3001/v1</span> — সার্ভার অন্য জায়গায় চললে সেই URL দিন।</div>
+        <div class="hint" data-i18n="flBaseHint">ডিফল্ট: http://localhost:3001/v1 — সার্ভার অন্য জায়গায় চললে সেই URL দিন।</div>
       </div>
-      <h3 style="margin:14px 0 8px">🧩 Custom OpenAI-Compatible Endpoint — নিজে যেকোনো প্রোভাইডার যোগ করুন</h3>
+      <h3 style="margin:14px 0 8px" data-i18n="customTitle">🧩 Custom Endpoint — নিজে যেকোনো প্রোভাইডার যোগ করুন</h3>
       <div class="grid2">
         <div class="field">
           <label class="label" for="customBase">Custom Base URL</label>
-          <input type="url" id="customBase" class="mono" placeholder="যেমন: https://generativelanguage.googleapis.com/v1beta/openai/" autocomplete="off" spellcheck="false">
-          <div class="hint">যেকোনো সার্ভিস যাদের <span class="mono">/models</span> ও <span class="mono">/chat/completions</span> আছে — যেমন Google Gemini, Together, Hugging Face Router, নিজের Ollama/LM Studio সার্ভার।</div>
+          <input type="url" id="customBase" class="mono" placeholder="https://generativelanguage.googleapis.com/v1beta/openai/" autocomplete="off" spellcheck="false">
+          <div class="hint" data-i18n="customBaseHint">যেকোনো OpenAI-কম্প্যাটিবল সার্ভিস — Gemini, Together, Hugging Face, Ollama ইত্যাদি।</div>
         </div>
         <div class="field">
           <label class="label" for="keyCustom">Custom API Key</label>
-          <input type="password" id="keyCustom" class="mono" placeholder="ওই প্রোভাইডারের key" autocomplete="off" spellcheck="false">
-          <div class="hint">লোকাল সার্ভারে (Ollama ইত্যাদি) key না লাগলে খালি রাখলেও চলবে।</div>
+          <input type="password" id="keyCustom" class="mono" autocomplete="off" spellcheck="false">
+          <div class="hint" data-i18n="customKeyHint">লোকাল সার্ভারে key না লাগলে খালি রাখলেও চলবে।</div>
         </div>
       </div>
       <div class="field">
-        <label class="label" for="customModel">Custom মডেল ID (হাতে লেখা)</label>
-        <input type="text" id="customModel" class="mono" placeholder="যেমন: gemini-2.0-flash, llama-3.3-70b-versatile…" autocomplete="off" spellcheck="false">
-        <div class="hint">Custom প্রোভাইডারে মডেল তালিকা না এলে এই ID-টাই ব্যবহার হবে। তালিকা এলে সেখান থেকেও বাছতে পারবেন।</div>
+        <label class="label" for="customModel" data-i18n="customModelLabel">Custom মডেল ID (হাতে লেখা)</label>
+        <input type="text" id="customModel" class="mono" placeholder="gemini-2.0-flash, llama-3.3-70b-versatile…" autocomplete="off" spellcheck="false">
+        <div class="hint" data-i18n="customModelHint">মডেল তালিকা না এলে এই ID-টাই ব্যবহার হবে।</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-        <button class="btn btn-primary" id="btnSaveSettings" type="button">সেভ করুন</button>
-        <button class="btn" id="btnTestFl" type="button">FreeLLMAPI সংযোগ টেস্ট</button>
-        <button class="btn btn-danger" id="btnWipe" type="button">সব Key মুছে ফেলুন</button>
+        <button class="btn btn-primary" id="btnSaveSettings" type="button" data-i18n="saveBtn">সেভ করুন</button>
+        <button class="btn" id="btnTestFl" type="button" data-i18n="testFlBtn">FreeLLMAPI সংযোগ টেস্ট</button>
+        <button class="btn btn-danger" id="btnWipe" type="button" data-i18n="wipeBtn">সব Key মুছে ফেলুন</button>
       </div>
       <div class="err" id="setErr"></div>
       <div class="okmsg" id="setOk"></div>
-      <p class="hint" style="margin:10px 0 0">Key গুলো এই ব্রাউজারের <b>localStorage</b>-এ থাকে — এই সাইটের কোনো সার্ভারে যায় না, শুধু সরাসরি সংশ্লিষ্ট প্রোভাইডারের API-তে পাঠানো হয় চ্যাট/ছবির সময়। এই পেজে কোনো key বসানো (hardcoded) নেই।</p>
+      <p class="hint" style="margin:10px 0 0" data-i18n="setNote">Key গুলো এই ব্রাউজারের localStorage-এ থাকে — কোনো সার্ভারে যায় না, শুধু সরাসরি প্রোভাইডারের API-তে পাঠানো হয়। এই পেজে কোনো key বসানো নেই।</p>
     </div>
   </details>
 
   <!-- Directory -->
-  <section class="card" id="dirSec" aria-label="সব প্রোভাইডার ডিরেক্টরি">
-    <h2>📚 সব প্রোভাইডার ও মডেল — ডিরেক্টরি</h2>
-    <p class="hint" style="margin:8px 0 0">চ্যাটের প্রোভাইডারগুলো উপরে সরাসরি চালানো যায়। ছবি/ভিডিওর ওয়েবসাইটগুলো লিংক থেকে খুলে ব্যবহার করুন। <span class="badge badge-free">FREE</span> মানে সত্যিই ফ্রি/ফ্রি টিয়ার আছে, <span class="badge badge-paid">PAID</span> মানে টাকা লাগবে — পেইড মডেল কখনো ফ্রি বলে চালানো হয়নি এখানে।</p>
+  <section class="card" id="dirSec" aria-label="Directory">
+    <h2 data-i18n="dirTitle">📚 সব প্রোভাইডার ও মডেল — ডিরেক্টরি</h2>
+    <p class="sec-sub" data-i18n="dirDesc">চ্যাটের প্রোভাইডারগুলো উপরে সরাসরি চালানো যায়। ছবি/ভিডিওর ওয়েবসাইটগুলো লিংক থেকে খুলে ব্যবহার করুন। FREE মানে সত্যিই ফ্রি টিয়ার আছে, PAID মানে টাকা লাগবে।</p>
     <div class="filters" id="dirFilters">
-      <button type="button" data-df="all" class="active">সব</button>
-      <button type="button" data-df="chat">💬 চ্যাট</button>
-      <button type="button" data-df="image">🎨 ছবি</button>
-      <button type="button" data-df="video">🎬 ভিডিও</button>
-      <button type="button" data-df="free">ফ্রি আছে</button>
-      <button type="button" data-df="paid">পেইড</button>
+      <button type="button" data-df="all" class="active" data-i18n="dfAll">সব</button>
+      <button type="button" data-df="chat" data-i18n="dfChat">💬 চ্যাট</button>
+      <button type="button" data-df="image" data-i18n="dfImage">🎨 ছবি</button>
+      <button type="button" data-df="video" data-i18n="dfVideo">🎬 ভিডিও</button>
+      <button type="button" data-df="free" data-i18n="dfFree">ফ্রি আছে</button>
+      <button type="button" data-df="paid" data-i18n="dfPaid">পেইড</button>
     </div>
     <div class="dir-grid" id="dirGrid">
-      <div class="tool" data-cat="chat free paid"><h3>OpenRouter <span class="badge badge-mix">FREE + PAID</span></h3><p>এক key দিয়ে শত শত মডেল — GPT, Claude, Gemini, Llama, DeepSeek। <span class="mono">:free</span> মডেল ফ্রি, বাকি পেইড। এই হাবেই সরাসরি চলে।</p><div class="links"><a class="primary" href="https://openrouter.ai/models" target="_blank" rel="noopener">মডেল তালিকা</a><a href="https://openrouter.ai/keys" target="_blank" rel="noopener">Key নিন</a></div></div>
-      <div class="tool" data-cat="chat free"><h3>FreeLLMAPI <span class="badge badge-free">FREE</span></h3><p>নিজের সার্ভারে চলা ওপেন-সোর্স প্রক্সি — Google, Groq, Cerebras-এর ফ্রি key এক unified key-তে। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://github.com/tashfeenahmed/freellmapi" target="_blank" rel="noopener">GitHub Repo</a></div></div>
-      <div class="tool" data-cat="chat free"><h3>Groq <span class="badge badge-free">FREE TIER</span></h3><p>Llama, Mixtral, Gemma — অবিশ্বাস্য দ্রুত উত্তর, ফ্রি টিয়ার আছে। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://console.groq.com/keys" target="_blank" rel="noopener">ফ্রি Key নিন</a><a href="https://console.groq.com" target="_blank" rel="noopener">Console</a></div></div>
-      <div class="tool" data-cat="chat free"><h3>Cerebras <span class="badge badge-free">FREE TIER</span></h3><p>Llama ও Qwen মডেল খুব দ্রুত চলে, ফ্রি টিয়ার আছে। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://cloud.cerebras.ai" target="_blank" rel="noopener">ফ্রি Key নিন</a></div></div>
-      <div class="tool" data-cat="chat free paid"><h3>Mistral AI <span class="badge badge-mix">FREE TIER + PAID</span></h3><p>Mistral ও Codestral মডেল, ফ্রি টিয়ার (Experiment) ও পেইড প্ল্যান দুটোই। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">Key নিন</a></div></div>
-      <div class="tool" data-cat="chat free"><h3>Google AI Studio — Gemini <span class="badge badge-free">FREE TIER</span></h3><p>Gemini মডেলের ফ্রি API key। Custom Endpoint-এ <span class="mono">https://generativelanguage.googleapis.com/v1beta/openai/</span> বসিয়ে এই হাবেই চালানো যায়।</p><div class="links"><a class="primary" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">ফ্রি Key নিন</a></div></div>
-      <div class="tool" data-cat="chat free paid"><h3>Together AI <span class="badge badge-mix">FREEMIUM</span></h3><p>অনেক ওপেন মডেল + FLUX ছবি। Custom Endpoint: <span class="mono">https://api.together.xyz/v1</span></p><div class="links"><a class="primary" href="https://api.together.ai" target="_blank" rel="noopener">ওয়েবসাইট</a></div></div>
-      <div class="tool" data-cat="chat image free paid"><h3>Hugging Face <span class="badge badge-mix">FREE TIER + PAID</span></h3><p>হাজারো ওপেন মডেল। Custom Endpoint: <span class="mono">https://router.huggingface.co/v1</span> — token দিয়ে চালানো যায়।</p><div class="links"><a class="primary" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">Token নিন</a><a href="https://huggingface.co/models" target="_blank" rel="noopener">মডেল</a></div></div>
-      <div class="tool" data-cat="chat free"><h3>GitHub Models <span class="badge badge-free">FREE</span></h3><p>GitHub অ্যাকাউন্ট থাকলেই ফ্রি মডেল ট্রাই করা যায়। Custom Endpoint: <span class="mono">https://models.github.ai/inference</span> — key হিসেবে GitHub token।</p><div class="links"><a class="primary" href="https://github.com/marketplace/models" target="_blank" rel="noopener">মডেল তালিকা</a><a href="https://github.com/settings/tokens" target="_blank" rel="noopener">Token</a></div></div>
-      <div class="tool" data-cat="chat free paid"><h3>NVIDIA NIM / Build <span class="badge badge-mix">FREE TIER</span></h3><p>অনেক মডেলের ফ্রি API ট্রায়াল, build.nvidia.com থেকে key। Custom Endpoint দিয়ে যোগ করা যায়।</p><div class="links"><a class="primary" href="https://build.nvidia.com" target="_blank" rel="noopener">ওয়েবসাইট</a></div></div>
-      <div class="tool" data-cat="chat paid"><h3>OpenAI — ChatGPT মডেল <span class="badge badge-paid">PAID</span></h3><p>GPT মডেলের অফিসিয়াল API, ক্রেডিট কিনে চালাতে হয়। Custom Endpoint: <span class="mono">https://api.openai.com/v1</span></p><div class="links"><a class="primary" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener">Key নিন</a></div></div>
-      <div class="tool" data-cat="chat paid"><h3>Anthropic — Claude <span class="badge badge-paid">PAID</span></h3><p>Claude মডেলের অফিসিয়াল কনসোল। (Claude API OpenAI-ফরম্যাটে এই হাবে সরাসরি নয় — OpenRouter দিয়ে Claude ফ্রি/পেইড দুইভাবেই চালানো যায়।)</p><div class="links"><a class="primary" href="https://console.anthropic.com" target="_blank" rel="noopener">Console</a></div></div>
-      <div class="tool" data-cat="chat free"><h3>Ollama — নিজের কম্পিউটারে <span class="badge badge-free">FREE • LOCAL</span></h3><p>ইন্টারনেট ছাড়াই নিজের PC-তে মডেল চালান। Custom Endpoint: <span class="mono">http://localhost:11434/v1</span></p><div class="links"><a class="primary" href="https://ollama.com" target="_blank" rel="noopener">ডাউনলোড</a></div></div>
-      <div class="tool" data-cat="image free"><h3>Pollinations <span class="badge badge-free">FREE</span></h3><p>key ছাড়াই FLUX ছবি — এই পেজের Image Studio-তেই সরাসরি চলে।</p><div class="links"><a class="primary" href="https://pollinations.ai" target="_blank" rel="noopener">ওয়েবসাইট</a></div></div>
-      <div class="tool" data-cat="image paid"><h3>OpenRouter Images <span class="badge badge-paid">PAID</span></h3><p>GPT Image, FLUX, Gemini Image সহ image মডেল এক API-তে — ক্রেডিট কাটবে, ফ্রি না। এই পেজের Image Studio-তে চলে।</p><div class="links"><a class="primary" href="https://openrouter.ai/models?output_modalities=image" target="_blank" rel="noopener">Image মডেল</a></div></div>
-      <div class="tool" data-cat="video free paid"><h3>ভিডিও টুলসমূহ <span class="badge badge-mix">FREEMIUM + PAID</span></h3><p>Luma, Runway, Kling, Hailuo, Pika, Veo, Sora — পুরো তালিকা উপরের ভিডিও সেকশনে। API দিয়ে এই হাব থেকে ভিডিও হয় না।</p><div class="links"><a class="primary" href="#videoSec">ভিডিও সেকশন দেখুন</a></div></div>
+      <div class="tool" data-cat="chat free paid"><h3>OpenRouter <span class="badge badge-mix">FREE + PAID</span></h3><p data-i18n="tOr">এক key দিয়ে শত শত মডেল — GPT, Claude, Gemini, Llama, DeepSeek। :free মডেল ফ্রি, বাকি পেইড। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://openrouter.ai/models" target="_blank" rel="noopener" data-i18n="modelsLink">মডেল তালিকা</a><a href="https://openrouter.ai/keys" target="_blank" rel="noopener" data-i18n="getKey">Key নিন</a></div></div>
+      <div class="tool" data-cat="chat free"><h3>FreeLLMAPI <span class="badge badge-free">FREE</span></h3><p data-i18n="tFl">নিজের সার্ভারে চলা ওপেন-সোর্স প্রক্সি — ফ্রি key গুলো এক unified key-তে। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://github.com/tashfeenahmed/freellmapi" target="_blank" rel="noopener">GitHub Repo</a></div></div>
+      <div class="tool" data-cat="chat free"><h3>Groq <span class="badge badge-free">FREE TIER</span></h3><p data-i18n="tGroq">Llama, Mixtral, Gemma — অবিশ্বাস্য দ্রুত উত্তর, ফ্রি টিয়ার আছে। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://console.groq.com/keys" target="_blank" rel="noopener" data-i18n="getFreeKey">ফ্রি Key নিন</a><a href="https://console.groq.com" target="_blank" rel="noopener">Console</a></div></div>
+      <div class="tool" data-cat="chat free"><h3>Cerebras <span class="badge badge-free">FREE TIER</span></h3><p data-i18n="tCer">Llama ও Qwen মডেল খুব দ্রুত চলে, ফ্রি টিয়ার আছে। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://cloud.cerebras.ai" target="_blank" rel="noopener" data-i18n="getFreeKey">ফ্রি Key নিন</a></div></div>
+      <div class="tool" data-cat="chat free paid"><h3>Mistral AI <span class="badge badge-mix">FREE TIER + PAID</span></h3><p data-i18n="tMis">Mistral ও Codestral মডেল, ফ্রি টিয়ার ও পেইড প্ল্যান দুটোই। এই হাবেই চলে।</p><div class="links"><a class="primary" href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener" data-i18n="getKey">Key নিন</a></div></div>
+      <div class="tool" data-cat="chat free"><h3>Google AI Studio — Gemini <span class="badge badge-free">FREE TIER</span></h3><p data-i18n="tGem">Gemini মডেলের ফ্রি API key। Custom Endpoint-এ বসিয়ে এই হাবেই চালানো যায়।</p><div class="links"><a class="primary" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" data-i18n="getFreeKey">ফ্রি Key নিন</a></div></div>
+      <div class="tool" data-cat="chat free paid"><h3>Together AI <span class="badge badge-mix">FREEMIUM</span></h3><p data-i18n="tTog">অনেক ওপেন মডেল + FLUX ছবি। Custom Endpoint: api.together.xyz/v1</p><div class="links"><a class="primary" href="https://api.together.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool" data-cat="chat image free paid"><h3>Hugging Face <span class="badge badge-mix">FREE TIER + PAID</span></h3><p data-i18n="tHf">হাজারো ওপেন মডেল। Custom Endpoint: router.huggingface.co/v1</p><div class="links"><a class="primary" href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">Token</a><a href="https://huggingface.co/models" target="_blank" rel="noopener" data-i18n="modelsLink">মডেল তালিকা</a></div></div>
+      <div class="tool" data-cat="chat free"><h3>GitHub Models <span class="badge badge-free">FREE</span></h3><p data-i18n="tGh">GitHub অ্যাকাউন্ট থাকলেই ফ্রি মডেল ট্রাই করা যায়। Custom Endpoint: models.github.ai/inference</p><div class="links"><a class="primary" href="https://github.com/marketplace/models" target="_blank" rel="noopener" data-i18n="modelsLink">মডেল তালিকা</a><a href="https://github.com/settings/tokens" target="_blank" rel="noopener">Token</a></div></div>
+      <div class="tool" data-cat="chat free paid"><h3>NVIDIA NIM / Build <span class="badge badge-mix">FREE TIER</span></h3><p data-i18n="tNv">অনেক মডেলের ফ্রি API ট্রায়াল, build.nvidia.com থেকে key।</p><div class="links"><a class="primary" href="https://build.nvidia.com" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool" data-cat="chat paid"><h3>OpenAI <span class="badge badge-paid">PAID</span></h3><p data-i18n="tOai">GPT মডেলের অফিসিয়াল API, ক্রেডিট কিনে চালাতে হয়। Custom Endpoint: api.openai.com/v1</p><div class="links"><a class="primary" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener" data-i18n="getKey">Key নিন</a></div></div>
+      <div class="tool" data-cat="chat paid"><h3>Anthropic — Claude <span class="badge badge-paid">PAID</span></h3><p data-i18n="tAnt">Claude মডেলের অফিসিয়াল কনসোল। OpenRouter দিয়ে Claude চালানো সহজ।</p><div class="links"><a class="primary" href="https://console.anthropic.com" target="_blank" rel="noopener">Console</a></div></div>
+      <div class="tool" data-cat="chat free"><h3>Ollama <span class="badge badge-free">FREE • LOCAL</span></h3><p data-i18n="tOll">ইন্টারনেট ছাড়াই নিজের PC-তে মডেল চালান। Custom Endpoint: localhost:11434/v1</p><div class="links"><a class="primary" href="https://ollama.com" target="_blank" rel="noopener" data-i18n="download">ডাউনলোড</a></div></div>
+      <div class="tool" data-cat="image free"><h3>Pollinations <span class="badge badge-free">FREE</span></h3><p data-i18n="tPol">key ছাড়াই FLUX ছবি — এই পেজের Image Studio-তেই সরাসরি চলে।</p><div class="links"><a class="primary" href="https://pollinations.ai" target="_blank" rel="noopener" data-i18n="visit">ওয়েবসাইটে যান</a></div></div>
+      <div class="tool" data-cat="image paid"><h3>OpenRouter Images <span class="badge badge-paid">PAID</span></h3><p data-i18n="tOrImg">GPT Image, FLUX, Gemini Image এক API-তে — ক্রেডিট কাটবে, ফ্রি না।</p><div class="links"><a class="primary" href="https://openrouter.ai/models?output_modalities=image" target="_blank" rel="noopener" data-i18n="modelsLink">মডেল তালিকা</a></div></div>
+      <div class="tool" data-cat="video free paid"><h3><span data-i18n="tVidT">ভিডিও টুলসমূহ</span> <span class="badge badge-mix">FREEMIUM + PAID</span></h3><p data-i18n="tVid">Luma, Runway, Kling, Hailuo, Pika, Veo, Sora — পুরো তালিকা উপরের ভিডিও সেকশনে।</p><div class="links"><a class="primary" href="#videoSec" data-i18n="tVidLink">ভিডিও সেকশন দেখুন</a></div></div>
     </div>
   </section>
 
   <!-- Hosting -->
-  <section class="card" id="hostSec" aria-label="ফ্রি ডোমেইন ও হোস্টিং">
-    <h2>🌐 ফ্রি ডোমেইন ও হোস্টিং — এই সাইট নিজে চালানোর উপায়</h2>
-    <p class="hint" style="margin:8px 0 0">এই পেজটা একটা মাত্র HTML ফাইল — নিচের যেকোনো ফ্রি হোস্টিংয়ে ফাইলটা আপলোড/ডিপ্লয় করলেই নিজের ঠিকানায় লাইভ হয়ে যাবে, ব্রাউজারে সরাসরি চালানো যাবে।</p>
-
+  <section class="card" id="hostSec" aria-label="Hosting">
+    <h2 data-i18n="hostTitle">🌐 ফ্রি ডোমেইন ও হোস্টিং — এই সাইট নিজে চালানোর উপায়</h2>
+    <p class="sec-sub" data-i18n="hostDesc">এই পেজটা একটা মাত্র HTML ফাইল — নিচের যেকোনো ফ্রি হোস্টিংয়ে আপলোড করলেই নিজের ঠিকানায় লাইভ হয়ে যাবে।</p>
     <div class="host-group">
-      <h3 style="color:var(--accent)">✅ গ্রুপ ১ — সম্পূর্ণ ফ্রি হোস্টিং</h3>
-      <div class="host-line"><b>Cloudflare Pages</b><span>সম্পূর্ণ ফ্রি হোস্টিং, ঠিকানা পাবেন <span class="addr">*.pages.dev</span> — স্ট্যাটিক সাইটে আনলিমিটেড ব্যান্ডউইথ।</span><a href="https://pages.cloudflare.com" target="_blank" rel="noopener">pages.cloudflare.com</a></div>
-      <div class="host-line"><b>GitHub Pages</b><span>সম্পূর্ণ ফ্রি হোস্টিং, ঠিকানা পাবেন <span class="addr">*.github.io</span> — GitHub repo থেকেই পাবলিশ হয়।</span><a href="https://pages.github.com" target="_blank" rel="noopener">pages.github.com</a></div>
-      <div class="host-line"><b>Netlify</b><span>সম্পূর্ণ ফ্রি হোস্টিং, ঠিকানা পাবেন <span class="addr">*.netlify.app</span> — ফাইল ড্র্যাগ-ড্রপ করেই সাইট লাইভ।</span><a href="https://www.netlify.com" target="_blank" rel="noopener">netlify.com</a></div>
-      <div class="host-line"><b>Vercel</b><span>সম্পূর্ণ ফ্রি হোস্টিং, ঠিকানা পাবেন <span class="addr">*.vercel.app</span> — GitHub থেকে এক ক্লিকে ডিপ্লয়।</span><a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></div>
+      <h3 style="color:var(--accent)" data-i18n="hostG1">✅ সম্পূর্ণ ফ্রি হোস্টিং</h3>
+      <div class="host-line"><b>Cloudflare Pages</b><span data-i18n="hCf">সম্পূর্ণ ফ্রি, ঠিকানা *.pages.dev — আনলিমিটেড ব্যান্ডউইথ।</span><a href="https://pages.cloudflare.com" target="_blank" rel="noopener">pages.cloudflare.com</a></div>
+      <div class="host-line"><b>GitHub Pages</b><span data-i18n="hGh">সম্পূর্ণ ফ্রি, ঠিকানা *.github.io — GitHub repo থেকেই পাবলিশ হয়।</span><a href="https://pages.github.com" target="_blank" rel="noopener">pages.github.com</a></div>
+      <div class="host-line"><b>Netlify</b><span data-i18n="hNet">সম্পূর্ণ ফ্রি, ঠিকানা *.netlify.app — ড্র্যাগ-ড্রপ করেই সাইট লাইভ।</span><a href="https://www.netlify.com" target="_blank" rel="noopener">netlify.com</a></div>
+      <div class="host-line"><b>Vercel</b><span data-i18n="hVer">সম্পূর্ণ ফ্রি, ঠিকানা *.vercel.app — GitHub থেকে এক ক্লিকে ডিপ্লয়।</span><a href="https://vercel.com" target="_blank" rel="noopener">vercel.com</a></div>
     </div>
-
     <div class="host-group">
-      <h3 style="color:var(--accent)">🆓 ফ্রি ডোমেইন / সাবডোমেইন</h3>
-      <div class="host-line"><b>eu.org</b><span>সত্যিকারের ফ্রি ডোমেইন — তবে ভলান্টিয়ার-চালিত, হাতে অনুমোদন (manual approval) পেতে কয়েক দিন থেকে কয়েক সপ্তাহ লাগতে পারে।</span><a href="https://nic.eu.org" target="_blank" rel="noopener">nic.eu.org</a></div>
-      <div class="host-line"><b>is-a.dev</b><span>ডেভেলপারদের জন্য ফ্রি সাবডোমেইন — GitHub-এ Pull Request (PR) পাঠিয়ে চাইতে হয়।</span><a href="https://www.is-a.dev" target="_blank" rel="noopener">is-a.dev</a></div>
-      <div class="host-line"><b>afraid.org FreeDNS</b><span>ফ্রি সাবডোমেইন পাওয়া যায় অনেকের শেয়ার করা ডোমেইনের নিচে।</span><a href="https://freedns.afraid.org" target="_blank" rel="noopener">freedns.afraid.org</a></div>
+      <h3 style="color:var(--accent)" data-i18n="hostG2">🆓 ফ্রি ডোমেইন / সাবডোমেইন</h3>
+      <div class="host-line"><b>eu.org</b><span data-i18n="hEu">সত্যিকারের ফ্রি ডোমেইন — হাতে অনুমোদন পেতে কয়েক দিন থেকে কয়েক সপ্তাহ লাগতে পারে।</span><a href="https://nic.eu.org" target="_blank" rel="noopener">nic.eu.org</a></div>
+      <div class="host-line"><b>is-a.dev</b><span data-i18n="hIsa">ডেভেলপারদের জন্য ফ্রি সাবডোমেইন — GitHub-এ Pull Request পাঠিয়ে চাইতে হয়।</span><a href="https://www.is-a.dev" target="_blank" rel="noopener">is-a.dev</a></div>
+      <div class="host-line"><b>afraid.org FreeDNS</b><span data-i18n="hAfr">ফ্রি সাবডোমেইন পাওয়া যায় অনেকের শেয়ার করা ডোমেইনের নিচে।</span><a href="https://freedns.afraid.org" target="_blank" rel="noopener">freedns.afraid.org</a></div>
     </div>
-
     <div class="host-group">
-      <h3 style="color:var(--amber)">💳 গ্রুপ ২ — পেইড হোস্টিং, প্রথম বছর ডোমেইন ফ্রি</h3>
-      <p class="hint">খেয়াল করুন: এই গ্রুপটা ফ্রি হোস্টিং <b>না</b> — হোস্টিংয়ের টাকা দিতে হয়, শুধু <b>ডোমেইনটা প্রথম ১ বছর ফ্রি</b>, এরপর ডোমেইন নিয়মিত দামে রিনিউ হবে।</p>
-      <div class="host-line"><b>IONOS</b><span>সব ওয়েব হোস্টিং প্ল্যানে প্রথম বছর ডোমেইন ফ্রি; Plus প্ল্যান প্রথম বছর $1/মাস থেকে, এরপর $14/মাস।</span><a href="https://www.ionos.com" target="_blank" rel="noopener">ionos.com</a></div>
-      <div class="host-line"><b>Hostinger</b><span>Single ছাড়া বাকি শেয়ার্ড প্ল্যানে (১২+ মাসের মেয়াদে) প্রথম বছর ডোমেইন ফ্রি; Premium ~$1.99–2.99/মাস থেকে, রিনিউ ~$10.99/মাস।</span><a href="https://www.hostinger.com" target="_blank" rel="noopener">hostinger.com</a></div>
-      <div class="host-line"><b>123 Reg</b><span>যোগ্য বার্ষিক (annual) প্ল্যানে প্রথম বছর ডোমেইন ফ্রি; Economy ~$2.63/মাস থেকে, রিনিউ ~$9.24/মাস।</span><a href="https://www.123-reg.co.uk" target="_blank" rel="noopener">123-reg.co.uk</a></div>
+      <h3 style="color:var(--amber)" data-i18n="hostG3">💳 পেইড হোস্টিং, প্রথম বছর ডোমেইন ফ্রি</h3>
+      <p class="hint" data-i18n="hostG3Note">এই গ্রুপটা ফ্রি হোস্টিং না — হোস্টিংয়ের টাকা দিতে হয়, শুধু ডোমেইনটা প্রথম ১ বছর ফ্রি।</p>
+      <div class="host-line"><b>IONOS</b><span data-i18n="hIon">সব প্ল্যানে প্রথম বছর ডোমেইন ফ্রি; Plus প্রথম বছর $1/মাস থেকে, এরপর $14/মাস।</span><a href="https://www.ionos.com" target="_blank" rel="noopener">ionos.com</a></div>
+      <div class="host-line"><b>Hostinger</b><span data-i18n="hHos">বেশিরভাগ শেয়ার্ড প্ল্যানে প্রথম বছর ডোমেইন ফ্রি; Premium ~$1.99–2.99/মাস থেকে।</span><a href="https://www.hostinger.com" target="_blank" rel="noopener">hostinger.com</a></div>
+      <div class="host-line"><b>123 Reg</b><span data-i18n="h123">যোগ্য বার্ষিক প্ল্যানে প্রথম বছর ডোমেইন ফ্রি; Economy ~$2.63/মাস থেকে।</span><a href="https://www.123-reg.co.uk" target="_blank" rel="noopener">123-reg.co.uk</a></div>
     </div>
-
-    <div class="warnbox">⚠️ <b>দুটো সতর্ক কথা:</b><br>• <b>uk.com ফ্রি না</b> — এটা একটা পেইড ডোমেইন, বছরে প্রায় $40–54 খরচ হয়। ফ্রি বলে কোথাও দেখলে ভুল বুঝবেন না।<br>• <b>Freenom (.tk / .ml / .ga) এখন বন্ধ/মৃত</b> — ওখানে আর ফ্রি ডোমেইন পাওয়া যায় না, সময় নষ্ট করবেন না।</div>
-
-    <h3 style="margin-top:16px">নিজে ডিপ্লয় করার সহজ ধাপ (Cloudflare Pages দিয়ে)</h3>
+    <div class="warnbox" data-i18n="hostWarn">⚠️ uk.com ফ্রি না — বছরে প্রায় $40–54 খরচ হয়। Freenom (.tk/.ml/.ga) এখন বন্ধ — ওখানে আর ফ্রি ডোমেইন পাওয়া যায় না।</div>
+    <h3 style="margin-top:16px" data-i18n="hostStepsT">নিজে ডিপ্লয় করার সহজ ধাপ (Cloudflare Pages দিয়ে)</h3>
     <ol class="steps">
-      <li>এই পেজের HTML ফাইলটা <code>index.html</code> নামে সেভ করুন।</li>
-      <li><a href="https://pages.cloudflare.com" target="_blank" rel="noopener">Cloudflare Pages</a>-এ ফ্রি অ্যাকাউন্ট খুলে “Upload assets” দিয়ে ফাইলটা আপলোড করুন।</li>
-      <li>সাথে সাথে আপনার সাইট লাইভ হবে <code>আপনার-নাম.pages.dev</code> ঠিকানায় — যেকোনো ব্রাউজারে সরাসরি চলবে।</li>
-      <li>চাইলে পরে eu.org / is-a.dev-এর ফ্রি ডোমেইনটা Cloudflare-এ কানেক্ট করে নিজের ঠিকানা বসাতে পারবেন।</li>
+      <li data-i18n="hs1">এই পেজের HTML ফাইলটা index.html নামে সেভ করুন।</li>
+      <li data-i18n="hs2">Cloudflare Pages-এ ফ্রি অ্যাকাউন্ট খুলে “Upload assets” দিয়ে ফাইলটা আপলোড করুন।</li>
+      <li data-i18n="hs3">সাথে সাথে আপনার সাইট লাইভ হবে আপনার-নাম.pages.dev ঠিকানায়।</li>
+      <li data-i18n="hs4">চাইলে পরে eu.org / is-a.dev-এর ফ্রি ডোমেইনটা কানেক্ট করে নিজের ঠিকানা বসাতে পারবেন।</li>
     </ol>
   </section>
 
   <!-- Guide -->
-  <section class="card guide" id="guideSec" aria-label="সেটআপ গাইড">
-    <h2>📖 সেটআপ গাইড — কোনটা কিভাবে কাজ করে</h2>
-
-    <h3 style="margin-top:16px;color:var(--accent)">১) OpenRouter — সবচেয়ে সহজ (২ মিনিট)</h3>
+  <section class="card guide" id="guideSec" aria-label="Guide">
+    <h2 data-i18n="guideTitle">📖 সেটআপ গাইড — কোনটা কিভাবে কাজ করে</h2>
+    <h3 style="margin-top:16px;color:var(--accent)" data-i18n="g1T">১) OpenRouter — সবচেয়ে সহজ (২ মিনিট)</h3>
     <ol class="steps">
-      <li><a href="https://openrouter.ai" target="_blank" rel="noopener">openrouter.ai</a>-তে ফ্রি অ্যাকাউন্ট খুলুন, তারপর <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">Keys পেজ</a> থেকে API key বানান।</li>
-      <li>Key-টা উপরের <b>Settings</b>-এ পেস্ট করে সেভ করুন।</li>
-      <li>দামের ফিল্টারে <b>“শুধু ফ্রি”</b> রেখে মডেল লোড করুন — প্রতিটা মডেলের পাশে <span class="badge badge-free">FREE</span> / <span class="badge badge-paid">PAID</span> লেবেল দেখা যাবে। ফ্রি মানে শুধু <code>:free</code> বা দাম $0 মডেল; পেইড মডেলে ক্রেডিট কাটবে, ফ্রি হবে না।</li>
-      <li>মডেল বেছে চ্যাট শুরু করুন।</li>
+      <li data-i18n="g1a">openrouter.ai-তে ফ্রি অ্যাকাউন্ট খুলুন, Keys পেজ থেকে API key বানান।</li>
+      <li data-i18n="g1b">Key-টা উপরের Settings-এ পেস্ট করে সেভ করুন।</li>
+      <li data-i18n="g1c">দামের ফিল্টারে “শুধু ফ্রি” রেখে মডেল লোড করুন — FREE মানে :free বা $0 মডেল; পেইড মডেলে ক্রেডিট কাটবে।</li>
+      <li data-i18n="g1d">মডেল বেছে চ্যাট শুরু করুন।</li>
     </ol>
-
-    <h3 style="margin-top:18px;color:var(--accent)">২) Groq / Cerebras / Mistral — ফ্রি টিয়ার key দিয়ে</h3>
+    <h3 style="margin-top:18px;color:var(--accent)" data-i18n="g2T">২) Groq / Cerebras / Mistral — ফ্রি টিয়ার key দিয়ে</h3>
     <ol class="steps">
-      <li>Groq: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> • Cerebras: <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener">cloud.cerebras.ai</a> • Mistral: <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">console.mistral.ai/api-keys</a> — প্রতিটার ফ্রি অ্যাকাউন্ট খুলে key বানান।</li>
-      <li>Settings-এ সংশ্লিষ্ট ঘরে key বসিয়ে সেভ করুন, উপরে ওই প্রোভাইডার বাছুন।</li>
-      <li>“মডেল লোড করুন” চাপুন — তালিকা আসবে ওই প্রোভাইডারের নিজের <code>/models</code> endpoint থেকে, লাইভ।</li>
+      <li data-i18n="g2a">প্রতিটার ফ্রি অ্যাকাউন্ট খুলে key বানান (লিংক Settings ও ডিরেক্টরিতে আছে)।</li>
+      <li data-i18n="g2b">Settings-এ সংশ্লিষ্ট ঘরে key বসিয়ে সেভ করুন, উপরে ওই প্রোভাইডার বাছুন।</li>
+      <li data-i18n="g2c">“মডেল লোড করুন” চাপুন — তালিকা আসবে ওই প্রোভাইডারের /models endpoint থেকে, লাইভ।</li>
     </ol>
-
-    <h3 style="margin-top:18px;color:var(--accent)">৩) Custom Endpoint — যেকোনো নতুন প্রোভাইডার নিজে যোগ করুন</h3>
-    <p>Gemini, Together, Hugging Face, GitHub Models, OpenAI, Ollama — যেকোনো OpenAI-কম্প্যাটিবল সার্ভিস: Settings-এর Custom ঘরে ওই সার্ভিসের <b>Base URL</b> আর <b>key</b> বসান, উপরে “Custom Endpoint” প্রোভাইডার বাছুন, মডেল লোড করুন। তালিকা না এলে <b>Custom মডেল ID</b> হাতে লিখে দিন — সেটাই ব্যবহার হবে। প্রতিটা ডিরেক্টরি কার্ডে ওই সার্ভিসের Base URL দেওয়া আছে।</p>
-
-    <h3 style="margin-top:18px;color:var(--accent)">৪) FreeLLMAPI — নিজের সার্ভারে চলে (self-hosted)</h3>
-    <p>FreeLLMAPI কোনো হোস্টেড ওয়েবসাইট না — ওপেন-সোর্স প্রক্সি, <b>নিজের কম্পিউটার/সার্ভারে</b> চালাতে হয়। ভেতরে Google, Groq, Cerebras-এর ফ্রি key এক জায়গায় জোড়া লাগিয়ে একটাই unified key দিয়ে সব মডেল চলে।</p>
+    <h3 style="margin-top:18px;color:var(--accent)" data-i18n="g3T">৩) Custom Endpoint — যেকোনো নতুন প্রোভাইডার নিজে যোগ করুন</h3>
+    <p data-i18n="g3p">Gemini, Together, Hugging Face, GitHub Models, OpenAI, Ollama — Settings-এর Custom ঘরে Base URL আর key বসান, “Custom Endpoint” প্রোভাইডার বাছুন, মডেল লোড করুন। তালিকা না এলে Custom মডেল ID হাতে লিখে দিন।</p>
+    <h3 style="margin-top:18px;color:var(--accent)" data-i18n="g4T">৪) FreeLLMAPI — নিজের সার্ভারে চলে</h3>
+    <p data-i18n="g4p">FreeLLMAPI ওপেন-সোর্স প্রক্সি — নিজের কম্পিউটার/সার্ভারে চালাতে হয়। ভেতরে ফ্রি key গুলো জোড়া লাগিয়ে একটাই unified key দিয়ে সব মডেল চলে।</p>
     <ol class="steps">
-      <li>Repo: <a href="https://github.com/tashfeenahmed/freellmapi" target="_blank" rel="noopener">github.com/tashfeenahmed/freellmapi</a> — <code>git clone</code> করে README অনুযায়ী install + চালু করুন।</li>
-      <li>ড্যাশবোর্ডে নিজের ফ্রি প্রোভাইডার key গুলো যোগ করুন (Google AI Studio, Groq, Cerebras ইত্যাদি)।</li>
-      <li>সার্ভার ডিফল্টে <code>http://localhost:3001</code>-এ চলবে। ড্যাশবোর্ড থেকে <b>unified key</b> (<code>freellmapi-…</code>) কপি করুন।</li>
-      <li>Settings-এ Base URL ও unified key বসিয়ে সেভ করুন, FreeLLMAPI প্রোভাইডার বেছে মডেল লোড করুন। ছবির জন্য সার্ভারে image মডেল সেটআপ থাকলে Image Studio-র FreeLLMAPI মোডে মডেল ID লিখে ছবিও বানানো যাবে।</li>
+      <li data-i18n="g4a">GitHub repo থেকে clone করে README অনুযায়ী install + চালু করুন।</li>
+      <li data-i18n="g4b">ড্যাশবোর্ডে নিজের ফ্রি প্রোভাইডার key গুলো যোগ করুন।</li>
+      <li data-i18n="g4c">সার্ভার ডিফল্টে localhost:3001-এ চলবে। ড্যাশবোর্ড থেকে unified key কপি করুন।</li>
+      <li data-i18n="g4d">Settings-এ Base URL ও unified key বসিয়ে সেভ করুন, FreeLLMAPI প্রোভাইডার বেছে মডেল লোড করুন।</li>
     </ol>
-    <div class="warnbox">⚠️ <b>মনে রাখুন:</b> FreeLLMAPI তখনই কাজ করবে যখন প্রক্সিটা চালু আছে <b>এবং</b> এই ব্রাউজার থেকে পৌঁছানো যাচ্ছে। iPhone থেকে খুললে <code>localhost</code> মানে ফোন নিজেই — কম্পিউটারের সার্ভার পাবে না। সেক্ষেত্রে সার্ভারের আসল ঠিকানা (একই Wi-Fi-র IP বা পাবলিক URL) Base URL-এ বসাতে হবে। হোস্টেড প্রোভাইডারগুলোতে (OpenRouter, Groq ইত্যাদি) এই ঝামেলা নেই।</div>
-
-    <h3 style="margin-top:18px;color:var(--accent)">৫) ছবি বানানো</h3>
-    <p>• <b>ফ্রি:</b> Image Studio-তে Pollinations মোড — key লাগে না, প্রম্পট লিখে বাটন চাপলেই ছবি।<br>
-    • <b>পেইড:</b> OpenRouter মোড — আগে Image মডেল লোড করুন (<code>GET /api/v1/images/models</code>), মডেল বেছে প্রম্পট + সাইজ দিন। <b>কোনো OpenRouter image মডেল ফ্রি না — ক্রেডিট কাটবে।</b><br>
-    • <b>FreeLLMAPI:</b> সার্ভারে image endpoint থাকলে ওই মোডে মডেল ID হাতে লিখে ছবি বানানো যাবে।</p>
-
-    <h3 style="margin-top:18px">সাধারণ সমস্যা</h3>
-    <p>• <b>401 / Unauthorized:</b> key ভুল বা মেয়াদ শেষ — Settings-এ আবার বসান।<br>
-    • <b>429 / Rate limit:</b> ফ্রি লিমিট শেষ — কিছুক্ষণ অপেক্ষা করুন বা অন্য ফ্রি মডেল নিন।<br>
-    • <b>Failed to fetch (FreeLLMAPI/Custom লোকাল):</b> সার্ভার বন্ধ, URL ভুল, বা ব্রাউজার পৌঁছাতে পারছে না।<br>
-    • <b>মডেল লিস্ট খালি:</b> দামের ফিল্টার “সব মডেল”-এ রেখে আবার লোড করুন।</p>
+    <div class="warnbox" data-i18n="g4Warn">⚠️ FreeLLMAPI তখনই কাজ করবে যখন প্রক্সিটা চালু আছে এবং এই ব্রাউজার থেকে পৌঁছানো যাচ্ছে। ফোন থেকে খুললে localhost মানে ফোন নিজেই — সার্ভারের আসল ঠিকানা Base URL-এ বসাতে হবে।</div>
+    <h3 style="margin-top:18px;color:var(--accent)" data-i18n="g5T">৫) ছবি বানানো</h3>
+    <p data-i18n="g5p">ফ্রি: Pollinations মোড — key লাগে না। পেইড: OpenRouter মোড — ক্রেডিট কাটবে। FreeLLMAPI: সার্ভারে image endpoint থাকলে মডেল ID হাতে লিখে ছবি বানানো যাবে।</p>
+    <h3 style="margin-top:18px" data-i18n="gTroubleT">সাধারণ সমস্যা</h3>
+    <p data-i18n="gTrouble">401: key ভুল বা মেয়াদ শেষ। 429: ফ্রি লিমিট শেষ — অপেক্ষা করুন বা অন্য মডেল নিন। Failed to fetch: সার্ভার বন্ধ বা URL ভুল। মডেল লিস্ট খালি: ফিল্টার “সব মডেল”-এ রেখে আবার লোড করুন।</p>
   </section>
 
-  <p class="foot">Gojo Free LLM Hub • Key শুধু আপনার ব্রাউজারেই থাকে, এই পেজে কোনো key বসানো নেই<br>OpenRouter: openrouter.ai • FreeLLMAPI: github.com/tashfeenahmed/freellmapi • Groq: groq.com • Cerebras: cerebras.ai • Mistral: mistral.ai</p>
+  <p class="foot" data-i18n="foot">Gojo Free LLM Hub • Key শুধু আপনার ব্রাউজারেই থাকে, এই পেজে কোনো key বসানো নেই<br>OpenRouter • FreeLLMAPI • Groq • Cerebras • Mistral</p>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -562,19 +709,108 @@
   function escapeHtml(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
   function showBox(el,msg){ if(!el) return; if(msg){ el.textContent=msg; el.style.display="block"; } else { el.style.display="none"; el.textContent=""; } }
 
+  /* ---------- i18n: Bangla captured from HTML, English dictionary below ---------- */
+  var BN={}, BN_PH={};
+  document.querySelectorAll("[data-i18n]").forEach(function(el){ var k=el.getAttribute("data-i18n"); if(!(k in BN)) BN[k]=el.innerHTML; });
+  document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ var k=el.getAttribute("data-i18n-ph"); if(!(k in BN_PH)) BN_PH[k]=el.getAttribute("placeholder")||""; });
+  var EN={
+    navBattle:"⚔️ Battle",navLb:"🏆 Leaderboard",navSettings:"🔑 Settings",
+    heroTitle:'All AI models, <span>one hub.</span>',
+    heroDesc:"Chat with free and paid models from 6 providers, battle two models side by side to see which is better, check the leaderboard rankings — with your own key, entirely in your own browser.",
+    stProvider:"Provider:",stModel:"Models:",heroModelLabel:"Model:",heroSend:"Send →",
+    q1:"Which model are you?",q2:"Write an X post",q3:"Cartoon story idea",q4:"What is an LLM API?",
+    navChat:"💬 Chat",navBattle2:"⚔️ Battle Mode",navLb2:"🏆 Leaderboard",navImage:"🎨 Create Image",navVideo:"🎬 Video Tools",navDir:"📚 All Providers",navHost:"🌐 Free Hosting",navGuide:"📖 Guide",
+    tabChat:"💬 Chat",tabBattle:"⚔️ Battle",tabBoard:"🏆 Leaderboard",
+    provTitle:"Choose a provider",provHint:"All are OpenAI-compatible APIs — they run in the same chat",
+    modelTitle:"Choose a model",modelSearchLabel:"Search models",modelListLabel:"Model list (live)",loadModels:"↻ Load models",
+    freeOnly:"Show free models only",priceBy:"By price:",pfAll:"All models",pfFree:"Free only",pfPaid:"Paid only",
+    modelHint:"Most providers need a key to load the model list. No key? Add one in Settings below.",
+    chatTitle:"💬 Chat",curModelLabel:"Current model:",copyBtn:"Copy",clearBtn:"New chat",
+    emptyTitle:"What would you like to talk about?",emptyDesc:"Pick a provider and model above and type below — or start from the big prompt box at the top.",
+    stopBtn:"■ Stop response",ready:"Ready",chatFoot:"Answers come straight from the provider's API • Always verify important facts",
+    battleTitle:"⚔️ Battle Mode — which model is better?",randomBtn:"🎲 Two random models",
+    battleDesc:"Send the same prompt to two models. Answers arrive anonymously — as Model A and Model B. Vote for the one you like, and only then are the real model names revealed.",
+    battleALabel:"For Model A (stays hidden)",battleBLabel:"For Model B (stays hidden)",
+    battleHint:"The model list comes from the current provider's loaded list. If it's empty, press “Load models” above. Both models run on the same provider and the same key.",
+    battlePromptLabel:"Battle prompt",battleGo:"⚔️ Start battle",voteA:"👈 A is better",voteTie:"🤝 It's a tie",voteB:"B is better 👉",newBattle:"🔀 New battle",
+    lbTitle:"🏆 Model Leaderboard",lbRefresh:"↻ Load all providers",
+    lbDesc:"Rankings are built from the live model lists — the bigger the context window, the higher the rank. Battle wins raise a model's win count here (counted for this session).",
+    lbRank:"Rank",lbModel:"Model",lbProvider:"Provider",lbPrice:"Price",lbCtx:"Context",lbWins:"Battle wins",
+    lbEmpty:"No models loaded yet. Pick a provider above and press “Load models” — the leaderboard fills itself.",
+    cardsTitle:"Model cards",cardsDesc:"The first 12 loaded models as cards — use one in chat or send it into a battle straight from its card.",cardsEmpty:"Cards will appear here once models are loaded.",
+    optTitle:"⚙️ Options",tempHint:"Low = precise and direct • High = creative",tokensLabel:"Max tokens",tokensHint:"How long the answer can be.",sysLabel:"System prompt",sysHint:"Sets the style of every answer. Leave empty for no system instruction.",streamLabel:"Streaming answer (word by word)",
+    imgTitle:"🎨 Create Images — Image Studio",imgDesc:"Three ways to make images: OpenRouter Images API (your key, uses credit), FreeLLMAPI (if your server has an image model), and Pollinations (completely free, no key).",
+    imgWarn:"💰 No OpenRouter image model is free — generating an image uses your credit. For truly free images, pick Pollinations mode.",
+    imgModeLabel:"Image method",imgModelLabel:"Image model (live from OpenRouter)",loadShort:"↻ Load",imgModelHint:"In FreeLLMAPI mode, type the model ID manually.",imgPromptLabel:"Image description (prompt) — English works best",imgSizeLabel:"Size",imgAspectLabel:"Aspect ratio",imgPolliLabel:"Pollinations model (free mode)",imgGen:"🎨 Generate image",imgDl:"⬇ Download / open image",imgAgain:"🔀 Another version",imgMore:"More image websites",
+    dLeo:"Create images on the website, with free daily tokens.",dIdeo:"Best for text inside images, with a free plan.",dGemImg:"Make images from the Gemini app and AI Studio.",dMj:"The most beautiful art-style images, paid plans only.",dFal:"API for FLUX and many image models, pay per use.",dRep:"Run thousands of image models via API, pay per run.",visit:"Visit website",
+    vidTitle:"🎬 Create Videos — Video",vidWarn:"ℹ️ OpenRouter and FreeLLMAPI don't offer video generation via API — use the websites below directly to make videos. Some have free credit, the rest are paid.",
+    vLuma:"Beautiful video from text/images, start with free credit.",vRun:"Gen-3/Gen-4 video models with pro editing tools.",vKling:"Long, realistic videos with daily free credit.",vHai:"Fast, good-quality video with free credit.",vPika:"Popular for fun effects and short videos, free plan available.",vPix:"Daily free credit, good for Shorts.",vVeo:"Google's Veo video model — on paid plans.",vSora:"OpenAI's video model, on paid ChatGPT plans.",vVidu:"Good for character-based video, free credit available.",vFal:"Many video models — Kling, Luma, Veo — through one API.",
+    setTitle:"🔑 Settings — API Key",setSub:"Stays only in your browser",orKeyHint:"Get a free key:",orKeyHint2:"models are free; the rest use credit.",freeKey:"Free key:",flKeyHint:"One unified key from the FreeLLMAPI dashboard — for all providers.",flBaseHint:"Default: http://localhost:3001/v1 — if the server runs elsewhere, use that URL.",
+    customTitle:"🧩 Custom Endpoint — add any provider yourself",customBaseHint:"Any OpenAI-compatible service — Gemini, Together, Hugging Face, Ollama, etc.",customKeyHint:"For local servers (Ollama etc.) you can leave this empty.",customModelLabel:"Custom model ID (manual)",customModelHint:"If the model list doesn't load, this ID will be used.",saveBtn:"Save",testFlBtn:"Test FreeLLMAPI connection",wipeBtn:"Delete all keys",
+    setNote:"Keys live in this browser's localStorage — they never go to any server of this site, only straight to the provider's API. No key is hardcoded in this page.",
+    dirTitle:"📚 All Providers & Models — Directory",dirDesc:"Chat providers above run right here. Open image/video websites from their links. FREE means a real free tier exists; PAID means it costs money.",
+    dfAll:"All",dfChat:"💬 Chat",dfImage:"🎨 Image",dfVideo:"🎬 Video",dfFree:"Has free",dfPaid:"Paid",
+    tOr:"Hundreds of models with one key — GPT, Claude, Gemini, Llama, DeepSeek. :free models are free, the rest are paid. Runs right in this hub.",tFl:"Open-source proxy on your own server — free keys combined into one unified key. Runs right in this hub.",tGroq:"Llama, Mixtral, Gemma at incredible speed, with a free tier. Runs right in this hub.",tCer:"Llama and Qwen run very fast, with a free tier. Runs right in this hub.",tMis:"Mistral and Codestral models, free tier and paid plans. Runs right in this hub.",tGem:"Free API key for Gemini models. Add it as a Custom Endpoint to run it in this hub.",tTog:"Many open models + FLUX images. Custom Endpoint: api.together.xyz/v1",tHf:"Thousands of open models. Custom Endpoint: router.huggingface.co/v1",tGh:"Try models free with just a GitHub account. Custom Endpoint: models.github.ai/inference",tNv:"Free API trials for many models, key from build.nvidia.com.",tOai:"The official GPT API — needs purchased credit. Custom Endpoint: api.openai.com/v1",tAnt:"The official Claude console. Running Claude via OpenRouter is easier.",tOll:"Run models on your own PC, no internet needed. Custom Endpoint: localhost:11434/v1",tPol:"FLUX images with no key — runs right in this page's Image Studio.",tOrImg:"GPT Image, FLUX, Gemini Image in one API — uses credit, not free.",tVidT:"Video tools",tVid:"Luma, Runway, Kling, Hailuo, Pika, Veo, Sora — the full list is in the Video section above.",tVidLink:"See the Video section",
+    modelsLink:"Model list",getKey:"Get key",getFreeKey:"Get free key",download:"Download",
+    hostTitle:"🌐 Free Domain & Hosting — run this site yourself",hostDesc:"This page is a single HTML file — upload it to any free host below and it goes live at your own address.",
+    hostG1:"✅ Completely free hosting",hCf:"Completely free, address *.pages.dev — unlimited bandwidth.",hGh:"Completely free, address *.github.io — publishes from a GitHub repo.",hNet:"Completely free, address *.netlify.app — drag & drop and the site is live.",hVer:"Completely free, address *.vercel.app — one-click deploy from GitHub.",
+    hostG2:"🆓 Free domain / subdomain",hEu:"A real free domain — manual approval can take days to weeks.",hIsa:"Free subdomain for developers — request it with a GitHub Pull Request.",hAfr:"Free subdomains under domains shared by others.",
+    hostG3:"💳 Paid hosting, domain free for the first year",hostG3Note:"This group is NOT free hosting — you pay for hosting; only the domain is free for the first year.",hIon:"Domain free for the first year on all plans; Plus from $1/mo in year one, then $14/mo.",hHos:"Domain free for the first year on most shared plans; Premium from ~$1.99–2.99/mo.",h123:"Domain free for the first year on eligible annual plans; Economy from ~$2.63/mo.",
+    hostWarn:"⚠️ uk.com is NOT free — it costs about $40–54 a year. Freenom (.tk/.ml/.ga) is shut down — free domains are no longer available there.",
+    hostStepsT:"Easy deploy steps (with Cloudflare Pages)",hs1:"Save this page's HTML file as index.html.",hs2:"Open a free Cloudflare Pages account and upload the file with “Upload assets”.",hs3:"Your site goes live instantly at your-name.pages.dev.",hs4:"Later you can connect a free eu.org / is-a.dev domain and use your own address.",
+    guideTitle:"📖 Setup Guide — how everything works",g1T:"1) OpenRouter — the easiest (2 minutes)",g1a:"Open a free account at openrouter.ai and create an API key on the Keys page.",g1b:"Paste the key into Settings above and save.",g1c:"Load models with the price filter on “Free only” — FREE means :free or $0 models; paid models use credit.",g1d:"Pick a model and start chatting.",
+    g2T:"2) Groq / Cerebras / Mistral — with free-tier keys",g2a:"Open a free account on each and create a key (links are in Settings and the Directory).",g2b:"Put each key in its Settings field, save, and pick that provider above.",g2c:"Press “Load models” — the list comes live from that provider's /models endpoint.",
+    g3T:"3) Custom Endpoint — add any new provider yourself",g3p:"Gemini, Together, Hugging Face, GitHub Models, OpenAI, Ollama — put the Base URL and key in the Custom fields in Settings, pick the “Custom Endpoint” provider, and load models. If the list doesn't load, type a Custom model ID manually.",
+    g4T:"4) FreeLLMAPI — runs on your own server",g4p:"FreeLLMAPI is an open-source proxy — you run it on your own computer/server. It combines your free keys so every model runs through one unified key.",g4a:"Clone the GitHub repo and install + start it following the README.",g4b:"Add your free provider keys in its dashboard.",g4c:"The server runs on localhost:3001 by default. Copy the unified key from the dashboard.",g4d:"Put the Base URL and unified key in Settings, pick the FreeLLMAPI provider, and load models.",
+    g4Warn:"⚠️ FreeLLMAPI only works while the proxy is running AND reachable from this browser. On a phone, localhost means the phone itself — put the server's real address in the Base URL.",
+    g5T:"5) Creating images",g5p:"Free: Pollinations mode — no key needed. Paid: OpenRouter mode — uses credit. FreeLLMAPI: if the server has an image endpoint, type the model ID manually in that mode.",
+    gTroubleT:"Common problems",gTrouble:"401: wrong or expired key. 429: free limit reached — wait or pick another model. Failed to fetch: server is off or the URL is wrong. Empty model list: set the filter to “All models” and load again.",
+    foot:"Gojo Free LLM Hub • Keys stay only in your browser — no key is hardcoded in this page<br>OpenRouter • FreeLLMAPI • Groq • Cerebras • Mistral"
+  };
+  var EN_PH={ heroPh:"Ask anything…", modelSearchPh:"e.g. llama, gemini, deepseek, qwen…", inputPh:"Type a message… (Enter = send)", battlePh:"Write one question — both models will answer it…" };
+  var DYN={
+    bn:{ saved:"সেভ আছে", none:"নেই", noneCustom:"নেই (লোকালে লাগতে পারে না)", ready:"প্রস্তুত", writing:"AI উত্তর লিখছে…", you:"আপনি", noModel:"কোনোটা বাছাই হয়নি", modelsWord:"টি মডেল", useBtn:"চ্যাটে ব্যবহার করুন", battleBtn:"ব্যাটলে নিন", thinking:"ভাবছে…", votedA:"আপনি Model A-কে ভোট দিয়েছেন — ওটা ছিল: ", votedB:"আপনি Model B-কে ভোট দিয়েছেন — ওটা ছিল: ", votedTie:"ড্র! দুটো মডেলই ছিল: ", andWord:" ও ", winsWord:" জয়", ctxWord:"কনটেক্সট" },
+    en:{ saved:"Saved", none:"None", noneCustom:"None (local may not need one)", ready:"Ready", writing:"AI is writing…", you:"You", noModel:"None selected", modelsWord:" models", useBtn:"Use in chat", battleBtn:"Send to battle", thinking:"Thinking…", votedA:"You voted for Model A — it was: ", votedB:"You voted for Model B — it was: ", votedTie:"A tie! The two models were: ", andWord:" and ", winsWord:" wins", ctxWord:"context" }
+  };
+  var lang = lsGet("gojo_llm_hub_lang","bn")==="en" ? "en" : "bn";
+  function t(k){ return (DYN[lang] && DYN[lang][k]) || DYN.bn[k] || k; }
+  function setLang(l, silent){
+    lang = (l==="en") ? "en" : "bn";
+    lsSet("gojo_llm_hub_lang", lang);
+    document.documentElement.lang = lang;
+    $("langEnBtn").classList.toggle("active", lang==="en");
+    $("langBnBtn").classList.toggle("active", lang==="bn");
+    $("langEnBtn").setAttribute("aria-pressed", lang==="en" ? "true" : "false");
+    $("langBnBtn").setAttribute("aria-pressed", lang==="bn" ? "true" : "false");
+    var dict = lang==="en" ? EN : BN;
+    document.querySelectorAll("[data-i18n]").forEach(function(el){ var k=el.getAttribute("data-i18n"); if(dict[k]!=null) el.innerHTML=dict[k]; });
+    var ph = lang==="en" ? EN_PH : BN_PH;
+    document.querySelectorAll("[data-i18n-ph]").forEach(function(el){ var k=el.getAttribute("data-i18n-ph"); if(ph[k]!=null) el.setAttribute("placeholder", ph[k]); });
+    document.querySelectorAll("[data-q-bn]").forEach(function(b){ b.setAttribute("data-q", lang==="en" ? b.getAttribute("data-q-en") : b.getAttribute("data-q-bn")); });
+    if(typeof renderProvGrid==="function"){ renderProvGrid(); renderModelOptions(); renderBoard(); renderCards(); }
+    if(typeof updateStatus==="function") updateStatus();
+    if(!silent && typeof toast==="function") toast(lang==="en" ? "Language: English ✓" : "ভাষা: বাংলা ✓");
+  }
+
   var PROVIDERS = {
-    openrouter:{ name:"OpenRouter", sub:"হোস্টেড • ফ্রি + পেইড মডেল", base:"https://openrouter.ai/api/v1", keyEl:"keyOr", lsKey:"gojo_llm_hub_or_key", pricing:true,
-      desc:'<b>OpenRouter</b> <span class="badge badge-mix">FREE + PAID</span> • এক key-তে শত শত মডেল। <span class="badge badge-free">FREE</span> = <span class="mono">:free</span> বা দাম $0 মডেল; <span class="badge badge-paid">PAID</span> মডেলে ক্রেডিট কাটবে। Key: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>' },
-    freellmapi:{ name:"FreeLLMAPI", sub:"নিজের সার্ভার • ফ্রি", dynamic:"fl", keyEl:"keyFl", lsKey:"gojo_llm_hub_fl_key",
-      desc:'<b>FreeLLMAPI</b> <span class="badge badge-free">FREE • SELF-HOSTED</span> • আপনার চালু সার্ভার থেকে মডেল আসবে। সার্ভার বন্ধ থাকলে লোড হবে না — নিচের গাইড দেখুন। Repo: <a href="https://github.com/tashfeenahmed/freellmapi" target="_blank" rel="noopener">github.com/tashfeenahmed/freellmapi</a>' },
-    groq:{ name:"Groq", sub:"ফ্রি টিয়ার • খুব দ্রুত", base:"https://api.groq.com/openai/v1", keyEl:"keyGroq", lsKey:"gojo_llm_hub_groq_key", tier:"free",
-      desc:'<b>Groq</b> <span class="badge badge-free">FREE TIER</span> • Llama/Mixtral/Gemma অবিশ্বাস্য গতিতে। ফ্রি key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> — লিমিট শেষ হলে 429 আসতে পারে।' },
-    cerebras:{ name:"Cerebras", sub:"ফ্রি টিয়ার • দ্রুত Llama/Qwen", base:"https://api.cerebras.ai/v1", keyEl:"keyCerebras", lsKey:"gojo_llm_hub_cerebras_key", tier:"free",
-      desc:'<b>Cerebras</b> <span class="badge badge-free">FREE TIER</span> • Llama ও Qwen খুব দ্রুত চলে। ফ্রি key: <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener">cloud.cerebras.ai</a>' },
-    mistral:{ name:"Mistral AI", sub:"ফ্রি টিয়ার + পেইড", base:"https://api.mistral.ai/v1", keyEl:"keyMistral", lsKey:"gojo_llm_hub_mistral_key", tier:"mix",
-      desc:'<b>Mistral AI</b> <span class="badge badge-mix">FREE TIER + PAID</span> • Mistral/Codestral মডেল। Key: <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">console.mistral.ai/api-keys</a>' },
-    custom:{ name:"Custom Endpoint", sub:"যেকোনো OpenAI-কম্প্যাটিবল API", dynamic:"custom", keyEl:"keyCustom", lsKey:"gojo_llm_hub_custom_key", manual:true,
-      desc:'<b>Custom Endpoint</b> <span class="badge badge-mix">আপনার পছন্দ</span> • Settings-এ Base URL + key বসান — Gemini, Together, Hugging Face, GitHub Models, OpenAI, Ollama (localhost:11434/v1) যেকোনোটা। মডেল তালিকা না এলে Custom মডেল ID ব্যবহার হবে।' }
+    openrouter:{ name:"OpenRouter", sub:"হোস্টেড • ফ্রি + পেইড মডেল", subEn:"Hosted • Free + Paid models", base:"https://openrouter.ai/api/v1", keyEl:"keyOr", lsKey:"gojo_llm_hub_or_key", pricing:true,
+      desc:'<b>OpenRouter</b> <span class="badge badge-mix">FREE + PAID</span> • এক key-তে শত শত মডেল। <span class="badge badge-free">FREE</span> = <span class="mono">:free</span> বা $0 মডেল; <span class="badge badge-paid">PAID</span> মডেলে ক্রেডিট কাটবে। Key: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>',
+      descEn:'<b>OpenRouter</b> <span class="badge badge-mix">FREE + PAID</span> • Hundreds of models with one key. <span class="badge badge-free">FREE</span> = <span class="mono">:free</span> or $0 models; <span class="badge badge-paid">PAID</span> models use credit. Key: <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>' },
+    freellmapi:{ name:"FreeLLMAPI", sub:"নিজের সার্ভার • ফ্রি", subEn:"Your own server • Free", dynamic:"fl", keyEl:"keyFl", lsKey:"gojo_llm_hub_fl_key",
+      desc:'<b>FreeLLMAPI</b> <span class="badge badge-free">FREE • SELF-HOSTED</span> • আপনার চালু সার্ভার থেকে মডেল আসবে। Repo: <a href="https://github.com/tashfeenahmed/freellmapi" target="_blank" rel="noopener">github.com/tashfeenahmed/freellmapi</a>',
+      descEn:'<b>FreeLLMAPI</b> <span class="badge badge-free">FREE • SELF-HOSTED</span> • Models come from your running server. Repo: <a href="https://github.com/tashfeenahmed/freellmapi" target="_blank" rel="noopener">github.com/tashfeenahmed/freellmapi</a>' },
+    groq:{ name:"Groq", sub:"ফ্রি টিয়ার • খুব দ্রুত", subEn:"Free tier • Very fast", base:"https://api.groq.com/openai/v1", keyEl:"keyGroq", lsKey:"gojo_llm_hub_groq_key", tier:"free",
+      desc:'<b>Groq</b> <span class="badge badge-free">FREE TIER</span> • Llama/Mixtral/Gemma অবিশ্বাস্য গতিতে। ফ্রি key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>',
+      descEn:'<b>Groq</b> <span class="badge badge-free">FREE TIER</span> • Llama/Mixtral/Gemma at incredible speed. Free key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a>' },
+    cerebras:{ name:"Cerebras", sub:"ফ্রি টিয়ার • দ্রুত Llama/Qwen", subEn:"Free tier • Fast Llama/Qwen", base:"https://api.cerebras.ai/v1", keyEl:"keyCerebras", lsKey:"gojo_llm_hub_cerebras_key", tier:"free",
+      desc:'<b>Cerebras</b> <span class="badge badge-free">FREE TIER</span> • Llama ও Qwen খুব দ্রুত চলে। ফ্রি key: <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener">cloud.cerebras.ai</a>',
+      descEn:'<b>Cerebras</b> <span class="badge badge-free">FREE TIER</span> • Llama and Qwen run very fast. Free key: <a href="https://cloud.cerebras.ai" target="_blank" rel="noopener">cloud.cerebras.ai</a>' },
+    mistral:{ name:"Mistral AI", sub:"ফ্রি টিয়ার + পেইড", subEn:"Free tier + Paid", base:"https://api.mistral.ai/v1", keyEl:"keyMistral", lsKey:"gojo_llm_hub_mistral_key", tier:"mix",
+      desc:'<b>Mistral AI</b> <span class="badge badge-mix">FREE TIER + PAID</span> • Mistral/Codestral মডেল। Key: <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">console.mistral.ai/api-keys</a>',
+      descEn:'<b>Mistral AI</b> <span class="badge badge-mix">FREE TIER + PAID</span> • Mistral/Codestral models. Key: <a href="https://console.mistral.ai/api-keys" target="_blank" rel="noopener">console.mistral.ai/api-keys</a>' },
+    custom:{ name:"Custom Endpoint", sub:"যেকোনো OpenAI-কম্প্যাটিবল API", subEn:"Any OpenAI-compatible API", dynamic:"custom", keyEl:"keyCustom", lsKey:"gojo_llm_hub_custom_key", manual:true,
+      desc:'<b>Custom Endpoint</b> <span class="badge badge-mix">আপনার পছন্দ</span> • Settings-এ Base URL + key বসান — Gemini, Together, Hugging Face, GitHub Models, OpenAI, Ollama যেকোনোটা।',
+      descEn:'<b>Custom Endpoint</b> <span class="badge badge-mix">YOUR CHOICE</span> • Put a Base URL + key in Settings — Gemini, Together, Hugging Face, GitHub Models, OpenAI, Ollama, anything.' }
   };
   var ORDER = ["openrouter","freellmapi","groq","cerebras","mistral","custom"];
   var LS = { provider:"gojo_llm_hub_provider", flBase:"gojo_llm_hub_fl_base", customBase:"gojo_llm_hub_custom_base", customModel:"gojo_llm_hub_custom_model", temp:"gojo_llm_hub_temp", tokens:"gojo_llm_hub_tokens", system:"gojo_llm_hub_system", freeOnly:"gojo_llm_hub_free_only", stream:"gojo_llm_hub_stream", priceFilter:"gojo_llm_hub_price_filter" };
@@ -593,22 +829,28 @@
     setErr:$("setErr"), setOk:$("setOk"), toast:$("toast"), settingsPanel:$("settingsPanel"),
     imgMode:$("imgMode"), imgModelSelect:$("imgModelSelect"), imgModelManual:$("imgModelManual"), btnLoadImg:$("btnLoadImgModels"),
     imgPrompt:$("imgPrompt"), imgSize:$("imgSize"), imgAspect:$("imgAspect"), imgPolliModel:$("imgPolliModel"), btnGenImg:$("btnGenImg"),
-    imgErr:$("imgErr"), imgOk:$("imgOk"), imgOut:$("imgOut"), imgResult:$("imgResult"), imgDownload:$("imgDownload"), btnImgAgain:$("btnImgAgain"), imgMeta:$("imgMeta")
+    imgErr:$("imgErr"), imgOk:$("imgOk"), imgOut:$("imgOut"), imgResult:$("imgResult"), imgDownload:$("imgDownload"), btnImgAgain:$("btnImgAgain"), imgMeta:$("imgMeta"),
+    heroInput:$("heroInput"), heroModel:$("heroModel"), btnHeroSend:$("btnHeroSend"),
+    battleA:$("battleA"), battleB:$("battleB"), battlePrompt:$("battlePrompt"), btnBattle:$("btnBattle"), btnRandom:$("btnRandomBattle"),
+    battleErr:$("battleErr"), battleArena:$("battleArena"), outA:$("battleOutA"), outB:$("battleOutB"),
+    revealA:$("revealA"), revealB:$("revealB"), voteRow:$("voteRow"), battleResult:$("battleResult"), btnNewBattle:$("btnNewBattle"),
+    panelA:$("bpanelA"), panelB:$("bpanelB"),
+    lbBody:$("lbBody"), lbEmpty:$("lbEmpty"), cardsGrid:$("cardsGrid"), cardsEmpty:$("cardsEmpty"), cardsCount:$("cardsCount")
   };
 
   var state = {
     provider: ORDER.indexOf(lsGet(LS.provider,"openrouter"))!==-1 ? lsGet(LS.provider,"openrouter") : "openrouter",
     models:{}, history:[], busy:false, abort:null,
-    priceFilter: lsGet(LS.priceFilter,"all")
+    priceFilter: lsGet(LS.priceFilter,"all"),
+    battleWins:{}, battle:null, battleBusy:false
   };
   ORDER.forEach(function(p){ state.models[p]=[]; });
 
-  // restore settings
   ORDER.forEach(function(p){ var el=$(PROVIDERS[p].keyEl); if(el) el.value = lsGet(PROVIDERS[p].lsKey,""); });
   els.flBase.value = lsGet(LS.flBase,"http://localhost:3001/v1") || "http://localhost:3001/v1";
   els.customBase.value = lsGet(LS.customBase,"");
   els.customModel.value = lsGet(LS.customModel,"");
-  var t = parseFloat(lsGet(LS.temp,"0.7")); if(!isNaN(t)) els.rngTemp.value=t;
+  var t0 = parseFloat(lsGet(LS.temp,"0.7")); if(!isNaN(t0)) els.rngTemp.value=t0;
   els.tempVal.textContent = Number(els.rngTemp.value).toFixed(1);
   var tk = lsGet(LS.tokens,""); if(tk) els.numTokens.value = tk;
   var sys = lsGet(LS.system,null); if(sys!==null) els.txtSystem.value = sys;
@@ -616,55 +858,45 @@
   els.chkStream.checked = lsGet(LS.stream,"1")!=="0";
 
   function toast(msg){ els.toast.textContent=msg; els.toast.classList.add("show"); clearTimeout(toast._t); toast._t=setTimeout(function(){ els.toast.classList.remove("show"); },2400); }
-  function normalizeBase(raw, fallback){ var b=(raw||"").trim().replace(/\/+$/,""); if(!b) b=fallback||""; if(b && !/\/v1(beta)?$/.test(b) && b.indexOf("openai")!==b.length-7){} return b; }
   function flBaseNorm(){ var b=(els.flBase.value||"").trim().replace(/\/+$/,""); if(!b) b="http://localhost:3001/v1"; if(!/\/v1$/.test(b)) b=b+"/v1"; return b; }
-  function curBase(){
-    var P=PROVIDERS[state.provider];
-    if(P.dynamic==="fl") return flBaseNorm();
-    if(P.dynamic==="custom"){ return (els.customBase.value||"").trim().replace(/\/+$/,""); }
-    return P.base;
-  }
-  function curKey(){ var el=$(PROVIDERS[state.provider].keyEl); return el ? el.value.trim() : ""; }
-  function curModelId(){
-    var v = els.modelSelect.value || "";
-    if(!v && state.provider==="custom") v = els.customModel.value.trim();
-    return v;
-  }
-  function isFreeOr(m){
-    if(!m) return false;
-    if(typeof m.id==="string" && m.id.indexOf(":free")!==-1) return true;
-    if(m.pricing){ var pr=parseFloat(m.pricing.prompt), co=parseFloat(m.pricing.completion); if(pr===0 && co===0) return true; }
-    return false;
-  }
+  function baseFor(p){ var P=PROVIDERS[p]; if(P.dynamic==="fl") return flBaseNorm(); if(P.dynamic==="custom") return (els.customBase.value||"").trim().replace(/\/+$/,""); return P.base; }
+  function keyFor(p){ var el=$(PROVIDERS[p].keyEl); return el ? el.value.trim() : ""; }
+  function curBase(){ return baseFor(state.provider); }
+  function curKey(){ return keyFor(state.provider); }
+  function curModelId(){ var v = els.modelSelect.value || ""; if(!v && state.provider==="custom") v = els.customModel.value.trim(); return v; }
+  function isFreeOr(m){ if(!m) return false; if(typeof m.id==="string" && m.id.indexOf(":free")!==-1) return true; if(m.pricing){ var pr=parseFloat(m.pricing.prompt), co=parseFloat(m.pricing.completion); if(pr===0 && co===0) return true; } return false; }
   function isPaidOr(m){ if(!m || !m.pricing) return false; var pr=parseFloat(m.pricing.prompt), co=parseFloat(m.pricing.completion); return (pr>0 || co>0); }
-  function modelTag(m){
-    var P=PROVIDERS[state.provider];
-    if(P.pricing) return isFreeOr(m) ? "FREE" : "PAID";
-    if(P.tier==="free") return "FREE TIER";
-    if(P.tier==="mix") return "TIER?";
-    return "";
+  function priceBadgeFor(p, m){
+    var P=PROVIDERS[p];
+    if(P.pricing) return isFreeOr(m) ? '<span class="badge badge-free">FREE</span>' : '<span class="badge badge-paid">PAID</span>';
+    if(P.tier==="free") return '<span class="badge badge-free">FREE TIER</span>';
+    if(P.tier==="mix") return '<span class="badge badge-mix">FREE + PAID</span>';
+    return '<span class="badge badge-mix">CUSTOM</span>';
   }
+  function modelTag(m){ var P=PROVIDERS[state.provider]; if(P.pricing) return isFreeOr(m) ? "FREE" : "PAID"; if(P.tier==="free") return "FREE TIER"; if(P.tier==="mix") return "TIER?"; return ""; }
   function updateStatus(){
     var P=PROVIDERS[state.provider];
     els.stProv.textContent = P.name;
     var has = !!curKey();
     var loaded = state.models[state.provider].length>0;
     els.dotProv.className = "dot " + (loaded ? "on" : (has ? "warn" : ""));
-    els.stKey.textContent = has ? "সেভ আছে" : (state.provider==="custom" ? "নেই (লোকালে লাগতে পারে না)" : "নেই");
+    els.stKey.textContent = has ? t("saved") : (state.provider==="custom" ? t("noneCustom") : t("none"));
     var n = state.models[state.provider].length;
-    els.stCount.textContent = n ? (n+"টি") : "—";
-    els.curModel.textContent = curModelId() || "কোনোটা বাছাই হয়নি";
+    els.stCount.textContent = n ? (lang==="en" ? String(n) : n+"টি") : "—";
+    var mid = curModelId();
+    els.curModel.textContent = mid || t("noModel");
+    els.heroModel.textContent = mid || "—";
   }
   function renderProvGrid(){
     els.provGrid.innerHTML="";
     ORDER.forEach(function(p){
       var P=PROVIDERS[p];
       var b=document.createElement("button"); b.type="button"; b.className="prov"+(p===state.provider?" active":"");
-      b.innerHTML="<b>"+escapeHtml(P.name)+"</b><small>"+escapeHtml(P.sub)+"</small>";
+      b.innerHTML="<b>"+escapeHtml(P.name)+"</b><small>"+escapeHtml(lang==="en" ? P.subEn : P.sub)+"</small>";
       b.addEventListener("click", function(){ setProvider(p); });
       els.provGrid.appendChild(b);
     });
-    els.provMeta.innerHTML = PROVIDERS[state.provider].desc;
+    els.provMeta.innerHTML = lang==="en" ? PROVIDERS[state.provider].descEn : PROVIDERS[state.provider].desc;
     els.provMeta.style.display="block";
   }
   function setProvider(p){
@@ -677,16 +909,14 @@
     var list = state.models[state.provider].slice();
     var P=PROVIDERS[state.provider];
     if(P.pricing){
-      if(state.priceFilter==="free" || (state.priceFilter==="all" && els.chkFree.checked && false)) {}
       if(state.priceFilter==="free") list=list.filter(isFreeOr);
       else if(state.priceFilter==="paid") list=list.filter(isPaidOr);
-      else if(els.chkFree.checked && state.priceFilter==="all" && chkFreeApplies()) list=list.filter(isFreeOr);
+      else if(els.chkFree.checked && state.priceFilter==="all" && state.provider==="openrouter") list=list.filter(isFreeOr);
     }
     var q = els.modelSearch.value.trim().toLowerCase();
     if(q) list=list.filter(function(m){ return (m.id+" "+(m.name||"")+" "+(m.owned_by||"")).toLowerCase().indexOf(q)!==-1; });
     return list;
   }
-  function chkFreeApplies(){ return state.provider==="openrouter" && state.priceFilter==="all" && els.chkFree.checked; }
   function renderModelOptions(){
     var list = filteredModels();
     var all = state.models[state.provider];
@@ -694,11 +924,9 @@
     var prev = els.modelSelect.value || saved;
     els.modelSelect.innerHTML="";
     if(all.length===0){
-      var o=document.createElement("option"); o.value="";
-      o.textContent = state.provider==="custom" ? "— তালিকা না এলে Settings-এ মডেল ID লিখুন —" : "— আগে মডেল লোড করুন —";
-      els.modelSelect.appendChild(o);
+      var o=document.createElement("option"); o.value=""; o.textContent = lang==="en" ? "— Load models first —" : "— আগে মডেল লোড করুন —"; els.modelSelect.appendChild(o);
     } else if(list.length===0){
-      var o2=document.createElement("option"); o2.value=""; o2.textContent="— এই ফিল্টারে কোনো মডেল নেই —"; els.modelSelect.appendChild(o2);
+      var o2=document.createElement("option"); o2.value=""; o2.textContent = lang==="en" ? "— No models in this filter —" : "— এই ফিল্টারে কোনো মডেল নেই —"; els.modelSelect.appendChild(o2);
     } else {
       list.forEach(function(m){
         var o=document.createElement("option"); o.value=m.id;
@@ -709,66 +937,187 @@
       var ids=list.map(function(m){return m.id;});
       els.modelSelect.value = ids.indexOf(prev)!==-1 ? prev : list[0].id;
     }
-    els.modelCountText.textContent = all.length ? (list.length+" / "+all.length+"টি মডেল") : "";
-    renderModelMeta(); updateStatus();
+    els.modelCountText.textContent = all.length ? (list.length+" / "+all.length + (lang==="en" ? " models" : "টি মডেল")) : "";
+    renderModelMeta(); renderBattleSelects(); renderCards(); renderBoard(); updateStatus();
   }
   function renderModelMeta(){
     var mid=curModelId();
     var m=state.models[state.provider].filter(function(x){return x.id===mid;})[0];
     if(!m){
-      if(state.provider==="custom" && mid){ els.modelMeta.innerHTML="<b>"+escapeHtml(mid)+"</b> &nbsp;•&nbsp; Custom মডেল ID (হাতে লেখা)"; els.modelMeta.style.display="block"; }
+      if(state.provider==="custom" && mid){ els.modelMeta.innerHTML="<b>"+escapeHtml(mid)+"</b> &nbsp;•&nbsp; Custom model ID"; els.modelMeta.style.display="block"; }
       else els.modelMeta.style.display="none";
-      els.curModel.textContent = mid || "কোনোটা বাছাই হয়নি"; return;
+      els.curModel.textContent = mid || t("noModel"); els.heroModel.textContent = mid || "—"; return;
     }
     var parts=[]; parts.push("<b>"+escapeHtml(m.id)+"</b>");
     if(m.name && m.name!==m.id) parts.push(escapeHtml(m.name));
-    var P=PROVIDERS[state.provider];
-    if(P.pricing){
-      parts.push(isFreeOr(m) ? '<span class="badge badge-free">FREE</span>' : '<span class="badge badge-paid">PAID — ক্রেডিট কাটবে</span>');
-      if(m.context_length) parts.push("Context: "+Number(m.context_length).toLocaleString("en-US")+" tokens");
-      if(m.pricing) parts.push("দাম: prompt $"+m.pricing.prompt+" / completion $"+m.pricing.completion+" (per token)");
-    } else {
-      if(P.tier==="free") parts.push('<span class="badge badge-free">FREE TIER</span>');
-      else if(P.tier==="mix") parts.push('<span class="badge badge-mix">FREE TIER + PAID</span>');
-      if(m.owned_by) parts.push("Provider: "+escapeHtml(m.owned_by));
-      parts.push("সোর্স: "+escapeHtml(P.name));
-    }
+    parts.push(priceBadgeFor(state.provider, m));
+    if(m.context_length) parts.push("Context: "+Number(m.context_length).toLocaleString("en-US")+" tokens");
+    if(m.owned_by) parts.push("Owner: "+escapeHtml(m.owned_by));
     els.modelMeta.innerHTML = parts.join(" &nbsp;•&nbsp; ");
     els.modelMeta.style.display="block";
     if(mid) lsSet(modelLsKey(state.provider), mid);
-    els.curModel.textContent = mid || "কোনোটা বাছাই হয়নি";
+    els.curModel.textContent = mid || t("noModel"); els.heroModel.textContent = mid || "—";
+  }
+  function fetchModels(p){
+    var base=baseFor(p), key=keyFor(p);
+    if(!base) return Promise.reject(new Error("no-base"));
+    var headers={}; if(key) headers["Authorization"]="Bearer "+key;
+    return fetch(base+"/models", { headers: headers }).then(function(r){
+      if(!r.ok) return r.text().then(function(tx){ throw new Error("HTTP "+r.status+" — "+tx.slice(0,220)); });
+      return r.json();
+    }).then(function(j){
+      var arr=(j && j.data) ? j.data : [];
+      arr.sort(function(a,b){ return String(a.id).localeCompare(String(b.id)); });
+      state.models[p]=arr; return arr;
+    });
   }
   function loadModels(manual){
-    var p=state.provider, base=curBase(), key=curKey();
+    var p=state.provider;
     showBox(els.modelErr,""); showBox(els.modelOk,"");
-    if(!base){ showBox(els.modelErr,"Custom Base URL দেওয়া হয়নি। Settings-এ Custom Endpoint-এর Base URL বসান।"); return; }
-    els.btnLoad.innerHTML='<span class="spin"></span> লোড হচ্ছে…'; els.btnLoad.disabled=true;
-    var headers={}; if(key) headers["Authorization"]="Bearer "+key;
-    fetch(base+"/models", { headers: headers })
-      .then(function(r){ if(!r.ok) return r.text().then(function(tx){ throw new Error("HTTP "+r.status+" — "+tx.slice(0,220)); }); return r.json(); })
-      .then(function(j){
-        var arr=(j && j.data) ? j.data : [];
-        arr.sort(function(a,b){ return String(a.id).localeCompare(String(b.id)); });
-        state.models[p]=arr; renderModelOptions();
-        if(arr.length===0) showBox(els.modelErr,"সার্ভার সাড়া দিয়েছে কিন্তু কোনো মডেল পাওয়া যায়নি।"+(p==="custom"?" Settings-এ Custom মডেল ID হাতে লিখে চ্যাট করা যাবে।":""));
-        else showBox(els.modelOk,"✓ "+arr.length+"টি মডেল লোড হয়েছে ("+PROVIDERS[p].name+")। এবার মডেল বেছে চ্যাট করুন।");
-        updateStatus();
-      })
-      .catch(function(e){
-        state.models[p]=[]; renderModelOptions();
-        var extra = p==="freellmapi" ? "\n\nসম্ভাব্য কারণ: সার্ভার চালু নেই, Base URL ভুল, অথবা iPhone থেকে localhost-এ পৌঁছানো যাচ্ছে না।"
-          : p==="custom" ? "\n\nBase URL / key ঠিক আছে তো? তালিকা না এলেও Settings-এ মডেল ID লিখে চ্যাট করা যাবে।"
-          : "\n\nkey ঠিক আছে তো? Settings-এ key বসিয়ে আবার চেষ্টা করুন।";
-        showBox(els.modelErr,"মডেল লোড হয়নি: "+(e && e.message ? e.message : e)+extra);
-      })
-      .finally(function(){ els.btnLoad.textContent="↻ মডেল লোড করুন"; els.btnLoad.disabled=false; });
+    if(!curBase()){ showBox(els.modelErr, lang==="en" ? "No Custom Base URL. Add one in Settings." : "Custom Base URL দেওয়া হয়নি। Settings-এ বসান।"); return; }
+    els.btnLoad.innerHTML='<span class="spin"></span> …'; els.btnLoad.disabled=true;
+    fetchModels(p).then(function(arr){
+      renderModelOptions();
+      if(arr.length===0) showBox(els.modelErr, lang==="en" ? "The server responded but no models were found." : "সার্ভার সাড়া দিয়েছে কিন্তু কোনো মডেল পাওয়া যায়নি।");
+      else showBox(els.modelOk, "✓ "+arr.length+(lang==="en" ? " models loaded (" : "টি মডেল লোড হয়েছে (")+PROVIDERS[p].name+")");
+      updateStatus();
+    }).catch(function(e){
+      state.models[p]=[]; renderModelOptions();
+      showBox(els.modelErr, (lang==="en" ? "Models failed to load: " : "মডেল লোড হয়নি: ")+(e && e.message ? e.message : e));
+    }).finally(function(){ els.btnLoad.innerHTML = lang==="en" ? "↻ Load models" : "↻ মডেল লোড করুন"; els.btnLoad.disabled=false; });
   }
 
-  // ---- Chat ----
+  /* ---------- Leaderboard & cards ---------- */
+  function allModels(){
+    var out=[];
+    ORDER.forEach(function(p){ state.models[p].forEach(function(m){ out.push({p:p, m:m}); }); });
+    return out;
+  }
+  function winKey(p,id){ return p+"|"+id; }
+  function renderBoard(){
+    var rows = allModels();
+    rows.sort(function(a,b){
+      var ca=a.m.context_length||0, cb=b.m.context_length||0;
+      if(cb!==ca) return cb-ca;
+      var wa=state.battleWins[winKey(a.p,a.m.id)]||0, wb=state.battleWins[winKey(b.p,b.m.id)]||0;
+      if(wb!==wa) return wb-wa;
+      return String(a.m.id).localeCompare(String(b.m.id));
+    });
+    els.lbBody.innerHTML="";
+    rows.slice(0,30).forEach(function(r, i){
+      var tr=document.createElement("tr");
+      var wins=state.battleWins[winKey(r.p,r.m.id)]||0;
+      var ctx=r.m.context_length ? Number(r.m.context_length).toLocaleString("en-US") : "—";
+      tr.innerHTML='<td><span class="rank'+(i<3?" top":"")+'">'+(i+1)+'</span></td>'+
+        '<td><span class="lb-model">'+escapeHtml(r.m.id)+'</span></td>'+
+        '<td>'+escapeHtml(PROVIDERS[r.p].name)+'</td>'+
+        '<td>'+priceBadgeFor(r.p, r.m)+'</td>'+
+        '<td>'+ctx+'</td>'+
+        '<td>'+(wins ? "🏆 "+wins : "—")+'</td>';
+      var td=document.createElement("td");
+      var b=document.createElement("button"); b.type="button"; b.className="btn lb-use"; b.textContent=t("useBtn");
+      (function(prov, mid){ b.addEventListener("click", function(){
+        if(state.provider!==prov){ state.provider=prov; lsSet(LS.provider,prov); els.freeRow.style.display = prov==="openrouter" ? "flex" : "none"; renderProvGrid(); renderModelOptions(); }
+        els.modelSelect.value=mid; renderModelMeta(); updateStatus();
+        $("chatSec").scrollIntoView({behavior:"smooth"});
+      }); })(r.p, r.m.id);
+      td.appendChild(b); tr.appendChild(td);
+      els.lbBody.appendChild(tr);
+    });
+    els.lbEmpty.style.display = rows.length ? "none" : "block";
+  }
+  function renderCards(){
+    var list = filteredModels();
+    els.cardsGrid.innerHTML="";
+    list.slice(0,12).forEach(function(m){
+      var d=document.createElement("div"); d.className="mcard";
+      var ctx=m.context_length ? Number(m.context_length).toLocaleString("en-US")+" tokens" : "";
+      d.innerHTML='<div class="mid">'+escapeHtml(m.id)+'</div><div>'+priceBadgeFor(state.provider,m)+'</div>'+(ctx?'<div class="meta">'+ctx+'</div>':"")+(m.owned_by?'<div class="meta">'+escapeHtml(m.owned_by)+'</div>':"");
+      var acts=document.createElement("div"); acts.className="acts";
+      var b1=document.createElement("button"); b1.type="button"; b1.className="btn btn-primary"; b1.textContent=t("useBtn");
+      b1.addEventListener("click", function(){ els.modelSelect.value=m.id; renderModelMeta(); updateStatus(); $("chatSec").scrollIntoView({behavior:"smooth"}); });
+      var b2=document.createElement("button"); b2.type="button"; b2.className="btn"; b2.textContent=t("battleBtn");
+      b2.addEventListener("click", function(){
+        var cur=els.battleA.value;
+        if(cur && cur!==m.id){ els.battleB.value=m.id; } else { els.battleA.value=m.id; }
+        $("battleSec").scrollIntoView({behavior:"smooth"});
+      });
+      acts.appendChild(b1); acts.appendChild(b2); d.appendChild(acts);
+      els.cardsGrid.appendChild(d);
+    });
+    els.cardsEmpty.style.display = list.length ? "none" : "block";
+    els.cardsCount.textContent = list.length ? (list.length+(lang==="en" ? " models" : "টি মডেল")) : "";
+  }
+  /* ---------- Battle ---------- */
+  function renderBattleSelects(){
+    var list = state.models[state.provider];
+    var pa=els.battleA.value, pb=els.battleB.value;
+    [els.battleA, els.battleB].forEach(function(sel){
+      sel.innerHTML="";
+      if(!list.length){ var o=document.createElement("option"); o.value=""; o.textContent= lang==="en" ? "— Load models first —" : "— আগে মডেল লোড করুন —"; sel.appendChild(o); return; }
+      list.forEach(function(m){ var o=document.createElement("option"); o.value=m.id; o.textContent=m.id; sel.appendChild(o); });
+    });
+    if(list.length){
+      var ids=list.map(function(m){return m.id;});
+      els.battleA.value = ids.indexOf(pa)!==-1 ? pa : ids[0];
+      els.battleB.value = ids.indexOf(pb)!==-1 && pb!==els.battleA.value ? pb : (ids[1] || ids[0]);
+    }
+  }
+  function callModel(p, modelId, prompt){
+    var base=baseFor(p), key=keyFor(p);
+    var headers={ "Content-Type":"application/json" }; if(key) headers["Authorization"]="Bearer "+key;
+    if(p==="openrouter") headers["X-Title"]="Gojo Free LLM Hub";
+    var sysTxt=els.txtSystem.value.trim();
+    var msgs=[]; if(sysTxt) msgs.push({role:"system", content:sysTxt});
+    msgs.push({role:"user", content:prompt});
+    return fetch(base+"/chat/completions", { method:"POST", headers:headers, body:JSON.stringify({ model:modelId, messages:msgs, temperature:parseFloat(els.rngTemp.value), stream:false }) })
+      .then(function(r){ if(!r.ok) return r.text().then(function(tx){ throw new Error("HTTP "+r.status+" — "+tx.slice(0,300)); }); return r.json(); })
+      .then(function(j){ return (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || ""; });
+  }
+  function startBattle(){
+    if(state.battleBusy) return;
+    showBox(els.battleErr,""); showBox(els.battleResult,"");
+    var a=els.battleA.value, b=els.battleB.value;
+    var prompt=els.battlePrompt.value.trim();
+    if(!a || !b){ showBox(els.battleErr, lang==="en" ? "Load models first, then pick two models." : "আগে মডেল লোড করে দুটো মডেল বাছুন।"); return; }
+    if(a===b){ showBox(els.battleErr, lang==="en" ? "Pick two different models for a battle." : "ব্যাটলের জন্য দুটো আলাদা মডেল বাছুন।"); return; }
+    if(!prompt){ showBox(els.battleErr, lang==="en" ? "Write a battle prompt first." : "আগে ব্যাটলের প্রম্পট লিখুন।"); return; }
+    if(!curKey() && state.provider!=="custom"){ showBox(els.battleErr, lang==="en" ? "No API key for this provider. Add one in Settings." : "এই প্রোভাইডারের API key দেওয়া হয়নি। Settings-এ বসান।"); els.settingsPanel.open=true; return; }
+    // randomize which side each model appears on
+    var flip = Math.random() < 0.5;
+    state.battle = { left: flip ? b : a, right: flip ? a : b, voted:false };
+    els.battleArena.style.display="block";
+    els.voteRow.style.display="none"; els.btnNewBattle.style.display="none";
+    els.revealA.textContent=""; els.revealB.textContent="";
+    els.panelA.classList.remove("winner"); els.panelB.classList.remove("winner");
+    els.outA.innerHTML='<span class="typing"><i></i><i></i><i></i></span> '+escapeHtml(t("thinking"));
+    els.outB.innerHTML='<span class="typing"><i></i><i></i><i></i></span> '+escapeHtml(t("thinking"));
+    els.battleArena.scrollIntoView({behavior:"smooth", block:"center"});
+    state.battleBusy=true; els.btnBattle.disabled=true;
+    var p=state.provider;
+    Promise.allSettled([ callModel(p, state.battle.left, prompt), callModel(p, state.battle.right, prompt) ]).then(function(res){
+      els.outA.textContent = res[0].status==="fulfilled" ? (res[0].value || "(empty)") : ("✗ "+(res[0].reason && res[0].reason.message ? res[0].reason.message : res[0].reason));
+      els.outB.textContent = res[1].status==="fulfilled" ? (res[1].value || "(empty)") : ("✗ "+(res[1].reason && res[1].reason.message ? res[1].reason.message : res[1].reason));
+      els.voteRow.style.display="flex";
+    }).finally(function(){ state.battleBusy=false; els.btnBattle.disabled=false; });
+  }
+  function vote(side){
+    if(!state.battle || state.battle.voted) return;
+    state.battle.voted=true;
+    var bt=state.battle;
+    els.revealA.textContent=bt.left; els.revealB.textContent=bt.right;
+    document.querySelectorAll("#voteRow button").forEach(function(x){ x.classList.remove("picked"); });
+    if(side==="A"){ $("voteA").classList.add("picked"); els.panelA.classList.add("winner"); var k1=winKey(state.provider, bt.left); state.battleWins[k1]=(state.battleWins[k1]||0)+1; showBox(els.battleResult, "🏆 "+t("votedA")+bt.left); }
+    else if(side==="B"){ $("voteB").classList.add("picked"); els.panelB.classList.add("winner"); var k2=winKey(state.provider, bt.right); state.battleWins[k2]=(state.battleWins[k2]||0)+1; showBox(els.battleResult, "🏆 "+t("votedB")+bt.right); }
+    else { $("voteTie").classList.add("picked"); showBox(els.battleResult, "🤝 "+t("votedTie")+bt.left+t("andWord")+bt.right); }
+    els.btnNewBattle.style.display="block";
+    renderBoard();
+  }
+  /* ---------- Chat ---------- */
   function addMsg(role, content, cls){
     if(els.empty) els.empty.style.display="none";
     var d=document.createElement("div"); d.className="msg "+(cls||role);
-    var who = role==="user" ? "আপনি" : (role==="assistant" ? "AI" : "");
+    var who = role==="user" ? t("you") : (role==="assistant" ? "AI" : "");
     if(who && !cls){ var w=document.createElement("div"); w.className="who"; w.textContent=who; d.appendChild(w); }
     var body=document.createElement("div"); body.className="msg-body"; body.textContent=content||"";
     d.appendChild(body); els.msgs.appendChild(d); els.msgs.scrollTop=els.msgs.scrollHeight; return body;
@@ -779,18 +1128,18 @@
     state.history.forEach(function(h){ out.push(h); });
     out.push({role:"user", content:userText}); return out;
   }
-  function setBusy(b){ state.busy=b; els.btnSend.disabled=b; els.stopRow.style.display=b?"block":"none"; els.chatStatus.textContent=b?"AI উত্তর লিখছে…":"প্রস্তুত"; }
+  function setBusy(b){ state.busy=b; els.btnSend.disabled=b; els.btnHeroSend.disabled=b; els.stopRow.style.display=b?"block":"none"; els.chatStatus.textContent=b? t("writing") : t("ready"); }
   function send(){
     if(state.busy) return;
     var text=els.input.value.trim(); if(!text) return;
     var mid=curModelId();
-    if(!mid){ addMsg("system","আগে উপরে একটা মডেল বেছে নিন। মডেল লিস্ট খালি থাকলে “মডেল লোড করুন” চাপুন, অথবা Custom হলে Settings-এ মডেল ID লিখুন।","error"); return; }
+    if(!mid){ addMsg("system", lang==="en" ? "Pick a model above first. If the list is empty, press “Load models”." : "আগে উপরে একটা মডেল বেছে নিন। লিস্ট খালি থাকলে “মডেল লোড করুন” চাপুন।","error"); return; }
     var key=curKey();
     if(!key && state.provider!=="custom"){
-      addMsg("system","এই প্রোভাইডারের API key দেওয়া হয়নি। নিচের Settings খুলে key বসিয়ে সেভ করুন।","error");
+      addMsg("system", lang==="en" ? "No API key for this provider. Open Settings, add the key and save." : "এই প্রোভাইডারের API key দেওয়া হয়নি। Settings খুলে key বসিয়ে সেভ করুন।","error");
       els.settingsPanel.open=true; els.settingsPanel.scrollIntoView({behavior:"smooth", block:"center"}); return;
     }
-    if(!curBase()){ addMsg("system","Custom Base URL দেওয়া হয়নি। Settings-এ বসান।","error"); return; }
+    if(!curBase()){ addMsg("system", lang==="en" ? "No Custom Base URL. Add one in Settings." : "Custom Base URL দেওয়া হয়নি। Settings-এ বসান।","error"); return; }
     els.input.value=""; autoGrow(); addMsg("user", text);
     var payload={ model:mid, messages:buildMessages(text), temperature:parseFloat(els.rngTemp.value), stream:!!els.chkStream.checked };
     var mt=parseInt(els.numTokens.value,10); if(!isNaN(mt) && mt>0) payload.max_tokens=mt;
@@ -814,19 +1163,19 @@
         });}
         return pump();
       }
-      return r.json().then(function(j){ full=(j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content)||""; assistantBody.textContent=full||"(খালি উত্তর এসেছে)"; });
+      return r.json().then(function(j){ full=(j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content)||""; assistantBody.textContent=full||"(empty)"; });
     })
     .then(function(){
-      if(!full) assistantBody.textContent="(খালি উত্তর এসেছে — অন্য মডেল চেষ্টা করুন)";
+      if(!full) assistantBody.textContent= lang==="en" ? "(Empty answer — try another model)" : "(খালি উত্তর এসেছে — অন্য মডেল চেষ্টা করুন)";
       state.history.push({role:"user",content:text}); state.history.push({role:"assistant",content:full});
       if(state.history.length>40) state.history=state.history.slice(-40);
     })
     .catch(function(e){
-      if(e && e.name==="AbortError"){ assistantBody.textContent=full+"\n\n[থামানো হয়েছে]"; if(full){ state.history.push({role:"user",content:text}); state.history.push({role:"assistant",content:full}); } return; }
+      if(e && e.name==="AbortError"){ assistantBody.textContent=full+"\n\n[stopped]"; if(full){ state.history.push({role:"user",content:text}); state.history.push({role:"assistant",content:full}); } return; }
       assistantBody.parentNode.className="msg error";
-      assistantBody.textContent="উত্তর আসেনি: "+(e && e.message ? e.message : e);
+      assistantBody.textContent=(lang==="en" ? "No answer: " : "উত্তর আসেনি: ")+(e && e.message ? e.message : e);
     })
-    .finally(function(){ setBusy(false); state.abort=null; els.input.focus(); });
+    .finally(function(){ setBusy(false); state.abort=null; });
   }
   function autoGrow(){ els.input.style.height="auto"; els.input.style.height=Math.min(els.input.scrollHeight,140)+"px"; }
   function saveSettings(silent){
@@ -835,9 +1184,9 @@
     lsSet(LS.customBase, els.customBase.value.trim());
     lsSet(LS.customModel, els.customModel.value.trim());
     updateStatus();
-    if(!silent){ showBox(els.setOk,"✓ সেভ হয়েছে — key শুধু এই ব্রাউজারেই থাকল।"); showBox(els.setErr,""); toast("Settings সেভ হয়েছে ✓"); }
+    if(!silent){ showBox(els.setOk, lang==="en" ? "✓ Saved — keys stay only in this browser." : "✓ সেভ হয়েছে — key শুধু এই ব্রাউজারেই থাকল।"); showBox(els.setErr,""); toast(lang==="en" ? "Settings saved ✓" : "Settings সেভ হয়েছে ✓"); }
   }
-  // ---- Image Studio ----
+  /* ---------- Image Studio ---------- */
   function imgModelId(){ return els.imgModelManual.value.trim() || els.imgModelSelect.value || ""; }
   function loadImgModels(){
     showBox(els.imgErr,""); showBox(els.imgOk,"");
@@ -848,12 +1197,12 @@
       .then(function(j){
         var arr=(j && j.data)?j.data:[]; arr.sort(function(a,b){ return String(a.id).localeCompare(String(b.id)); });
         els.imgModelSelect.innerHTML="";
-        if(!arr.length){ var o=document.createElement("option"); o.value=""; o.textContent="— কোনো image মডেল আসেনি, ID হাতে লিখুন —"; els.imgModelSelect.appendChild(o); }
+        if(!arr.length){ var o=document.createElement("option"); o.value=""; o.textContent="—"; els.imgModelSelect.appendChild(o); }
         arr.forEach(function(m){ var o=document.createElement("option"); o.value=m.id; o.textContent=m.id+"  • PAID"; els.imgModelSelect.appendChild(o); });
-        showBox(els.imgOk,"✓ "+arr.length+"টি image মডেল লোড হয়েছে। মনে রাখুন: সবগুলোই PAID — ছবি বানালে OpenRouter ক্রেডিট কাটবে।");
+        showBox(els.imgOk, "✓ "+arr.length+(lang==="en" ? " image models loaded. All are PAID." : "টি image মডেল লোড হয়েছে। সবগুলোই PAID।"));
       })
-      .catch(function(e){ showBox(els.imgErr,"Image মডেল লোড হয়নি: "+(e && e.message?e.message:e)+"\nOpenRouter key ঠিক আছে তো? চাইলে মডেল ID হাতে লিখেও চেষ্টা করা যাবে।"); })
-      .finally(function(){ els.btnLoadImg.textContent="↻ লোড"; els.btnLoadImg.disabled=false; });
+      .catch(function(e){ showBox(els.imgErr, (lang==="en" ? "Image models failed to load: " : "Image মডেল লোড হয়নি: ")+(e && e.message?e.message:e)); })
+      .finally(function(){ els.btnLoadImg.textContent = lang==="en" ? "↻ Load" : "↻ লোড"; els.btnLoadImg.disabled=false; });
   }
   function showImg(src, meta){
     els.imgResult.src=src; els.imgDownload.href=src; els.imgMeta.textContent=meta||""; els.imgOut.style.display="block";
@@ -861,25 +1210,25 @@
   }
   function genImage(){
     var prompt=els.imgPrompt.value.trim();
-    if(!prompt){ showBox(els.imgErr,"আগে ছবির বর্ণনা (prompt) লিখুন।"); return; }
+    if(!prompt){ showBox(els.imgErr, lang==="en" ? "Write an image prompt first." : "আগে ছবির বর্ণনা (prompt) লিখুন।"); return; }
     showBox(els.imgErr,""); showBox(els.imgOk,"");
     var mode=els.imgMode.value; var size=els.imgSize.value; var wh=size.split("x"); var w=parseInt(wh[0],10)||1024, h=parseInt(wh[1],10)||1024;
-    els.btnGenImg.disabled=true; els.btnGenImg.innerHTML='<span class="spin"></span> ছবি তৈরি হচ্ছে…';
-    function done(){ els.btnGenImg.disabled=false; els.btnGenImg.textContent="🎨 ছবি বানান"; }
+    els.btnGenImg.disabled=true; els.btnGenImg.innerHTML='<span class="spin"></span> …';
+    function done(){ els.btnGenImg.disabled=false; els.btnGenImg.textContent = lang==="en" ? "🎨 Generate image" : "🎨 ছবি বানান"; }
     if(mode==="pollinations"){
       var seed=Math.floor(Math.random()*999999);
       var url="https://image.pollinations.ai/prompt/"+encodeURIComponent(prompt)+"?width="+w+"&height="+h+"&seed="+seed+"&model="+encodeURIComponent(els.imgPolliModel.value)+"&nologo=true";
       var pre=new Image();
-      pre.onload=function(){ showImg(url,"Pollinations • "+els.imgPolliModel.value+" • "+size+" • সম্পূর্ণ ফ্রি"); showBox(els.imgOk,"✓ ছবি তৈরি (Pollinations, ফ্রি)।"); done(); };
-      pre.onerror=function(){ showBox(els.imgErr,"Pollinations থেকে ছবি আসেনি — একটু পরে আবার চেষ্টা করুন, বা prompt বদলে দিন।"); done(); };
+      pre.onload=function(){ showImg(url,"Pollinations • "+els.imgPolliModel.value+" • "+size+" • FREE"); showBox(els.imgOk,"✓ "+(lang==="en" ? "Image created (Pollinations, free)." : "ছবি তৈরি (Pollinations, ফ্রি)।")); done(); };
+      pre.onerror=function(){ showBox(els.imgErr, lang==="en" ? "Pollinations didn't return an image — try again shortly." : "Pollinations থেকে ছবি আসেনি — একটু পরে আবার চেষ্টা করুন।"); done(); };
       pre.src=url; return;
     }
     var isOr = mode==="openrouter";
     var base = isOr ? "https://openrouter.ai/api/v1" : flBaseNorm();
     var key = isOr ? els.keyOr.value.trim() : els.keyFl.value.trim();
     var model = imgModelId();
-    if(!model){ showBox(els.imgErr, isOr ? "আগে image মডেল লোড করুন বা মডেল ID হাতে লিখুন।" : "FreeLLMAPI মোডে image মডেল ID হাতে লিখুন (উপরের ঘরে)।"); done(); return; }
-    if(isOr && !key){ showBox(els.imgErr,"OpenRouter key দেওয়া হয়নি। Settings-এ বসান।"); els.settingsPanel.open=true; done(); return; }
+    if(!model){ showBox(els.imgErr, lang==="en" ? "Load an image model or type a model ID first." : "আগে image মডেল লোড করুন বা মডেল ID হাতে লিখুন।"); done(); return; }
+    if(isOr && !key){ showBox(els.imgErr, lang==="en" ? "No OpenRouter key. Add one in Settings." : "OpenRouter key দেওয়া হয়নি। Settings-এ বসান।"); els.settingsPanel.open=true; done(); return; }
     var headers={ "Content-Type":"application/json" }; if(key) headers["Authorization"]="Bearer "+key;
     var endpoint = isOr ? base+"/images" : base+"/images/generations";
     var body = isOr ? { model:model, prompt:prompt, size:size, aspect_ratio:els.imgAspect.value, n:1 } : { model:model, prompt:prompt, size:size, n:1 };
@@ -887,34 +1236,55 @@
       .then(function(r){ if(!r.ok) return r.text().then(function(tx){ throw new Error("HTTP "+r.status+" — "+tx.slice(0,300)); }); return r.json(); })
       .then(function(j){
         var d=j && j.data && j.data[0];
-        if(!d) throw new Error("API সাড়া দিয়েছে কিন্তু ছবি পাওয়া যায়নি।");
-        if(d.b64_json) showImg("data:image/png;base64,"+d.b64_json, model+" • "+size+(isOr?" • OpenRouter (ক্রেডিট কেটেছে)":" • FreeLLMAPI"));
-        else if(d.url) showImg(d.url, model+" • "+size+(isOr?" • OpenRouter (ক্রেডিট কেটেছে)":" • FreeLLMAPI"));
-        else throw new Error("ছবির ডেটা অচেনা ফরম্যাটে এসেছে।");
-        showBox(els.imgOk,"✓ ছবি তৈরি হয়েছে।");
+        if(!d) throw new Error("no-image");
+        if(d.b64_json) showImg("data:image/png;base64,"+d.b64_json, model+" • "+size);
+        else if(d.url) showImg(d.url, model+" • "+size);
+        else throw new Error("unknown-format");
+        showBox(els.imgOk,"✓ "+(lang==="en" ? "Image created." : "ছবি তৈরি হয়েছে।"));
       })
-      .catch(function(e){ showBox(els.imgErr,"ছবি হয়নি: "+(e && e.message?e.message:e)+(isOr?"":"\nFreeLLMAPI সার্ভারে image মডেল/endpoint সেটআপ আছে তো?")); })
+      .catch(function(e){ showBox(els.imgErr, (lang==="en" ? "Image failed: " : "ছবি হয়নি: ")+(e && e.message?e.message:e)); })
       .finally(done);
   }
-  // ---- Events ----
+  /* ---------- Events ---------- */
+  $("langEnBtn").addEventListener("click", function(){ setLang("en"); });
+  $("langBnBtn").addEventListener("click", function(){ setLang("bn"); });
+  document.querySelectorAll(".mode-tab").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".mode-tab").forEach(function(x){ x.classList.remove("active"); });
+      b.classList.add("active");
+      var m=b.getAttribute("data-mode");
+      var target = m==="battle" ? "battleSec" : (m==="board" ? "lbSec" : "chatSec");
+      $(target).scrollIntoView({behavior:"smooth"});
+    });
+  });
+  els.btnHeroSend.addEventListener("click", function(){
+    var v=els.heroInput.value.trim(); if(!v){ els.heroInput.focus(); return; }
+    els.input.value=v; els.heroInput.value=""; autoGrow();
+    $("chatSec").scrollIntoView({behavior:"smooth"}); send();
+  });
+  els.heroInput.addEventListener("keydown", function(e){ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); els.btnHeroSend.click(); } });
+  document.querySelectorAll(".hero-chip").forEach(function(b){ b.addEventListener("click", function(){ els.heroInput.value=b.getAttribute("data-q"); els.btnHeroSend.click(); }); });
   els.btnLoad.addEventListener("click", function(){ saveSettings(true); loadModels(true); });
+  $("btnRefreshLb").addEventListener("click", function(){
+    var jobs = ORDER.filter(function(p){ return p==="openrouter" || keyFor(p) || p==="custom" && els.customBase.value.trim(); }).map(function(p){ return fetchModels(p).catch(function(){ return []; }); });
+    Promise.all(jobs).then(function(){ renderModelOptions(); toast(lang==="en" ? "Leaderboard refreshed ✓" : "লিডারবোর্ড রিফ্রেশ হয়েছে ✓"); });
+  });
   els.modelSelect.addEventListener("change", renderModelMeta);
   els.modelSearch.addEventListener("input", renderModelOptions);
   els.chkFree.addEventListener("change", function(){ lsSet(LS.freeOnly, els.chkFree.checked?"1":"0"); if(state.priceFilter!=="all"){ state.priceFilter="all"; lsSet(LS.priceFilter,"all"); syncPriceFilter(); } renderModelOptions(); });
-  function syncPriceFilter(){ document.querySelectorAll(".price-f").forEach(function(b){ var on=b.getAttribute("data-pf")===state.priceFilter; b.style.background=on?"var(--accent)":"transparent"; b.style.color=on?"var(--accent-text)":"var(--text)"; b.style.borderColor=on?"var(--accent)":"var(--border2)"; }); }
+  function syncPriceFilter(){ document.querySelectorAll(".price-f").forEach(function(b){ var on=b.getAttribute("data-pf")===state.priceFilter; b.style.background=on?"var(--ink)":"#fff"; b.style.color=on?"#fff":"var(--text)"; b.style.borderColor=on?"var(--ink)":"var(--border2)"; }); }
   document.querySelectorAll(".price-f").forEach(function(b){ b.addEventListener("click", function(){ state.priceFilter=b.getAttribute("data-pf"); lsSet(LS.priceFilter, state.priceFilter); syncPriceFilter(); renderModelOptions(); }); });
   els.btnSend.addEventListener("click", send);
   els.btnStop.addEventListener("click", function(){ if(state.abort) state.abort.abort(); });
   els.input.addEventListener("keydown", function(e){ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
   els.input.addEventListener("input", autoGrow);
-  els.btnClear.addEventListener("click", function(){ state.history=[]; els.msgs.innerHTML=""; els.msgs.appendChild(els.empty); els.empty.style.display="block"; els.chatStatus.textContent="নতুন চ্যাট শুরু হয়েছে"; toast("নতুন চ্যাট শুরু হয়েছে"); });
+  els.btnClear.addEventListener("click", function(){ state.history=[]; els.msgs.innerHTML=""; els.msgs.appendChild(els.empty); els.empty.style.display="block"; els.chatStatus.textContent=t("ready"); toast(lang==="en" ? "New chat started" : "নতুন চ্যাট শুরু হয়েছে"); });
   els.btnCopy.addEventListener("click", function(){
-    var txt=state.history.map(function(h){ return (h.role==="user"?"আপনি: ":"AI: ")+h.content; }).join("\n\n");
-    if(!txt){ toast("কপি করার মতো চ্যাট নেই"); return; }
-    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){ toast("চ্যাট কপি হয়েছে ✓"); }, function(){ toast("কপি হয়নি"); });
-    else toast("এই ব্রাউজারে কপি সাপোর্ট নেই");
+    var txt=state.history.map(function(h){ return (h.role==="user"? t("you")+": " : "AI: ")+h.content; }).join("\n\n");
+    if(!txt){ toast(lang==="en" ? "Nothing to copy" : "কপি করার মতো চ্যাট নেই"); return; }
+    if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function(){ toast("✓"); }, function(){ toast("✗"); });
   });
-  document.querySelectorAll(".quick button").forEach(function(b){ b.addEventListener("click", function(){ els.input.value=b.getAttribute("data-q"); autoGrow(); send(); }); });
+  document.querySelectorAll(".quick-btn").forEach(function(b){ b.addEventListener("click", function(){ els.input.value=b.getAttribute("data-q"); autoGrow(); send(); }); });
   els.rngTemp.addEventListener("input", function(){ els.tempVal.textContent=Number(els.rngTemp.value).toFixed(1); lsSet(LS.temp, els.rngTemp.value); });
   els.numTokens.addEventListener("change", function(){ lsSet(LS.tokens, els.numTokens.value); });
   els.txtSystem.addEventListener("change", function(){ lsSet(LS.system, els.txtSystem.value); });
@@ -923,23 +1293,35 @@
   [els.keyOr, els.keyGroq, els.keyCerebras, els.keyMistral, els.keyFl, els.flBase, els.customBase, els.keyCustom, els.customModel].forEach(function(inp){ if(inp) inp.addEventListener("change", function(){ saveSettings(true); updateStatus(); }); });
   els.btnTestFl.addEventListener("click", function(){
     saveSettings(true); showBox(els.setErr,""); showBox(els.setOk,"");
-    var base=flBaseNorm(), key=els.keyFl.value.trim(); var headers={}; if(key) headers["Authorization"]="Bearer "+key;
-    els.btnTestFl.innerHTML='<span class="spin"></span> টেস্ট হচ্ছে…'; els.btnTestFl.disabled=true;
-    fetch(base+"/models",{headers:headers})
-      .then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
-      .then(function(j){ var n=(j&&j.data)?j.data.length:0; showBox(els.setOk,"✓ FreeLLMAPI সংযোগ OK — সার্ভার সাড়া দিয়েছে, "+n+"টি মডেল পাওয়া গেছে।"); state.models.freellmapi=(j&&j.data)?j.data:[]; if(state.provider==="freellmapi") renderModelOptions(); updateStatus(); })
-      .catch(function(e){ showBox(els.setErr,"সংযোগ হয়নি: "+(e&&e.message?e.message:e)+"\nসার্ভার চালু আছে তো? Base URL ঠিক আছে তো? iPhone হলে localhost কাজ করবে না — সার্ভারের আসল ঠিকানা লাগবে।"); })
-      .finally(function(){ els.btnTestFl.textContent="FreeLLMAPI সংযোগ টেস্ট"; els.btnTestFl.disabled=false; });
+    els.btnTestFl.innerHTML='<span class="spin"></span> …'; els.btnTestFl.disabled=true;
+    fetchModels("freellmapi").then(function(arr){ showBox(els.setOk,"✓ FreeLLMAPI OK — "+arr.length+(lang==="en" ? " models found." : "টি মডেল পাওয়া গেছে।")); if(state.provider==="freellmapi") renderModelOptions(); updateStatus(); })
+      .catch(function(e){ showBox(els.setErr, (lang==="en" ? "Connection failed: " : "সংযোগ হয়নি: ")+(e&&e.message?e.message:e)); })
+      .finally(function(){ els.btnTestFl.textContent = lang==="en" ? "Test FreeLLMAPI connection" : "FreeLLMAPI সংযোগ টেস্ট"; els.btnTestFl.disabled=false; });
   });
   els.btnWipe.addEventListener("click", function(){
     ORDER.forEach(function(p){ lsDel(PROVIDERS[p].lsKey); var el=$(PROVIDERS[p].keyEl); if(el) el.value=""; });
-    updateStatus(); showBox(els.setOk,"সব key মুছে ফেলা হয়েছে এই ব্রাউজার থেকে।"); toast("Key মুছে ফেলা হয়েছে");
+    updateStatus(); showBox(els.setOk, lang==="en" ? "All keys deleted from this browser." : "সব key মুছে ফেলা হয়েছে এই ব্রাউজার থেকে।"); toast("✓");
   });
   els.btnLoadImg.addEventListener("click", loadImgModels);
   els.btnGenImg.addEventListener("click", genImage);
   els.btnImgAgain.addEventListener("click", genImage);
   els.imgMode.addEventListener("change", function(){ $("imgModelWrap").style.opacity = els.imgMode.value==="pollinations" ? ".45" : "1"; });
-  // Directory filters
+  els.btnBattle.addEventListener("click", startBattle);
+  els.btnNewBattle.addEventListener("click", function(){
+    state.battle=null; els.battleArena.style.display="none"; showBox(els.battleResult,"");
+    $("battleSec").scrollIntoView({behavior:"smooth"});
+  });
+  els.btnRandom.addEventListener("click", function(){
+    var list=state.models[state.provider];
+    if(list.length<2){ showBox(els.battleErr, lang==="en" ? "Load at least 2 models first." : "আগে অন্তত ২টা মডেল লোড করুন।"); return; }
+    var i=Math.floor(Math.random()*list.length), j2=i;
+    while(j2===i) j2=Math.floor(Math.random()*list.length);
+    els.battleA.value=list[i].id; els.battleB.value=list[j2].id;
+    showBox(els.battleErr,""); toast("🎲 "+list[i].id+" vs "+list[j2].id);
+  });
+  $("voteA").addEventListener("click", function(){ vote("A"); });
+  $("voteB").addEventListener("click", function(){ vote("B"); });
+  $("voteTie").addEventListener("click", function(){ vote("tie"); });
   document.querySelectorAll("#dirFilters button").forEach(function(b){
     b.addEventListener("click", function(){
       document.querySelectorAll("#dirFilters button").forEach(function(x){ x.classList.remove("active"); });
@@ -951,12 +1333,13 @@
       });
     });
   });
-  // ---- Init ----
+  /* ---------- Init ---------- */
   syncPriceFilter();
+  setLang(lang, true);
   setProvider(state.provider);
   var anyKey = ORDER.some(function(p){ var el=$(PROVIDERS[p].keyEl); return el && el.value.trim(); });
   els.settingsPanel.open = !anyKey;
-  updateStatus(); autoGrow();
+  updateStatus(); autoGrow(); renderBoard(); renderCards();
 })();
 </script>
 </body>
